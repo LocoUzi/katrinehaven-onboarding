@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding System - Katrinehaven, Viborg Kommune</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header h2 {
+            font-size: 18px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .case-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .action-bar {
+            padding: 20px 30px;
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: #2563eb;
+        }
+
+        .action-btn.secondary {
+            background: white;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+
+        .action-btn.secondary:hover {
+            background: #f8fafc;
+        }
+
+        .action-btn.success {
+            background: #10b981;
+            color: white;
+        }
+
+        .action-btn.success:hover {
+            background: #059669;
+        }
+
+        .case-selector {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 200px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        .email-list {
+            margin-top: 15px;
+        }
+
+        .email-recipient {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #f8fafc;
+        }
+
+        .email-recipient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .email-recipient-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .email-recipient-email {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .email-send-btn {
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .email-send-btn:hover {
+            background: #2563eb;
+        }
+
+        .email-send-btn.sent {
+            background: #10b981;
+        }
+
+        .email-tasks {
+            font-size: 12px;
+            color: #475569;
+            margin-top: 8px;
+            padding-left: 15px;
+        }
+
+        .email-tasks li {
+            margin-bottom: 3px;
+        }
+
+        .cases-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .case-item {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .case-item:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+
+        .case-item:hover .delete-case-btn {
+            opacity: 1;
+        }
+
+        .delete-case-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 11px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 10;
+        }
+
+        .delete-case-btn:hover {
+            background: #dc2626;
+        }
+
+        .case-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .case-item-number {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .case-item-date {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .case-item-name {
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .progress-section {
+            padding: 20px 30px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .progress-bar-container {
+            background: #e2e8f0;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .employee-info {
+            padding: 30px;
+            background: #fefce8;
+            border-bottom: 2px solid #fbbf24;
+        }
+
+        .employee-info h3 {
+            color: #92400e;
+            margin-bottom: 15px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-field label {
+            font-size: 12px;
+            color: #92400e;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .info-field input {
+            padding: 8px 12px;
+            border: 2px solid #fbbf24;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .info-field input:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .week-section {
+            margin-bottom: 35px;
+        }
+
+        .week-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .week-header h2 {
+            font-size: 18px;
+            flex: 1;
+        }
+
+        .week-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .task-item {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .task-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .task-item:hover .delete-task-btn {
+            opacity: 1;
+        }
+
+        .task-item.completed {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        .task-item.hidden {
+            display: none;
+        }
+
+        .delete-task-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .delete-task-btn:hover {
+            background: #dc2626;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .task-checkbox {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .task-item.completed .task-title {
+            color: #6b7280;
+        }
+
+        .task-details {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .task-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .meta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .meta-badge.responsible {
+            border-color: #bfdbfe;
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        .meta-badge.time {
+            border-color: #fecaca;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .meta-badge.date {
+            border-color: #d8b4fe;
+            background: #faf5ff;
+            color: #6b21a8;
+        }
+
+        .signature-section {
+            margin-top: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            display: none;
+        }
+
+        .task-item.completed .signature-section {
+            display: block;
+        }
+
+        .signature-section h4 {
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .signature-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .signature-field label {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .signature-field input {
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .signature-field input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .date-input-wrapper {
+            margin-top: 8px;
+            display: none;
+        }
+
+        .task-item.completed .date-input-wrapper {
+            display: block;
+        }
+
+        .date-input-wrapper label {
+            font-size: 12px;
+            color: #64748b;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .date-input-wrapper input[type="date"] {
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .submit-section {
+            padding: 30px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            display: none;
+            background: #f0fdf4;
+            border: 2px solid #86efac;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 30px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-message h3 {
+            color: #166534;
+            margin-bottom: 10px;
+        }
+
+        .success-message p {
+            color: #15803d;
+        }
+
+        .footer {
+            padding: 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            background: #f8fafc;
+        }
+
+        .pre-start {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .pre-start .week-header {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .external-courses {
+            background: #fce7f3;
+            border-left: 4px solid #ec4899;
+        }
+
+        .external-courses .week-header {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+        }
+
+        .auto-save-indicator {
+            font-size: 12px;
+            color: #10b981;
+            margin-left: auto;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .submit-section, .progress-section, .action-bar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .signature-grid {
+                grid-template-columns: 1fr;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .action-bar {
+                flex-direction: column;
+            }
+            .case-selector {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="case-number" id="caseNumber">Sag: -</div>
+            <h1>🏥 Velkommen til Katrinehaven</h1>
+            <h2>Onboarding System - Viborg Kommune</h2>
+        </div>
+
+        <div class="action-bar">
+            <button class="action-btn primary" id="newCaseBtn">+ Ny Onboarding</button>
+            <button class="action-btn secondary" id="loadCaseBtn">📂 Indlæs Onboarding</button>
+            <button class="action-btn success" id="saveBtn">💾 Gem</button>
+            <select class="case-selector" id="caseSelector">
+                <option value="">Vælg en onboarding...</option>
+            </select>
+            <span class="auto-save-indicator" id="autoSaveIndicator"></span>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+            <div class="progress-text" id="progressText">0 af 22 aktiviteter gennemført</div>
+        </div>
+
+        <div class="employee-info">
+            <h3>📋 Medarbejderoplysninger</h3>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label>Medarbejderens navn *</label>
+                    <input type="text" id="employeeName" placeholder="Indtast fulde navn" required>
+                </div>
+                <div class="info-field">
+                    <label>Klynge/Afdeling *</label>
+                    <input type="text" id="employeeCluster" placeholder="Fx Klynge 1" required>
+                </div>
+                <div class="info-field">
+                    <label>Startdato *</label>
+                    <input type="date" id="startDate" required>
+                </div>
+                <div class="info-field">
+                    <label>Teamleders email *</label>
+                    <input type="email" id="managerEmail" placeholder="teamleder@viborg.dk" required>
+                </div>
+                <div class="info-field">
+                    <label>Arbejdstidsplanlægger *</label>
+                    <input type="text" id="workPlanner" placeholder="Navn" required>
+                </div>
+                <div class="info-field">
+                    <label>Arbejdstidsplanlægger Email *</label>
+                    <input type="email" id="workPlannerEmail" placeholder="email@viborg.dk" required>
+                </div>
+                <div class="info-field">
+                    <label>Mentor *</label>
+                    <input type="text" id="mentorName" placeholder="Navn" required>
+                </div>
+                <div class="info-field">
+                    <label>Mentor Email *</label>
+                    <input type="email" id="mentorEmail" placeholder="email@viborg.dk" required>
+                </div>
+                <div class="info-field">
+                    <label>Forflytningsvejleder *</label>
+                    <input type="text" id="movementAdvisor" placeholder="Navn" required>
+                </div>
+                <div class="info-field">
+                    <label>Forflytningsvejleder Email *</label>
+                    <input type="email" id="movementAdvisorEmail" placeholder="email@viborg.dk" required>
+                </div>
+                <div class="info-field">
+                    <label>AMR *</label>
+                    <input type="text" id="amrName" placeholder="Navn" required>
+                </div>
+                <div class="info-field">
+                    <label>AMR Email *</label>
+                    <input type="email" id="amrEmail" placeholder="email@viborg.dk" required>
+                </div>
+                <div class="info-field">
+                    <label>Medicinansvarlig *</label>
+                    <input type="text" id="medicineResponsible" placeholder="Navn" required>
+                </div>
+                <div class="info-field">
+                    <label>Medicinansvarlig Email *</label>
+                    <input type="email" id="medicineResponsibleEmail" placeholder="email@viborg.dk" required>
+                </div>
+            </div>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="action-btn success" id="sendWelcomeBtn" disabled style="padding: 12px 30px; font-size: 15px;">
+                    📧 Send velkomst-email til alle ansvarlige
+                </button>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <h3>✅ Onboarding-program gennemført!</h3>
+            <p>Din teamleder har modtaget en bekræftelse med oversigt over alle gennemførte aktiviteter inkl. underskrifter.</p>
+        </div>
+
+        <div class="content" id="tasksContent">
+            <!-- Opgaver indsættes her dynamisk -->
+        </div>
+
+        <div class="submit-section">
+            <button class="submit-btn" id="submitBtn" disabled>
+                Send til leder
+            </button>
+            <p style="margin-top: 10px; color: #64748b; font-size: 13px;">
+                Knappen aktiveres når alle oplysninger er udfyldt og alle opgaver er afkrydsede
+            </p>
+        </div>
+
+        <div class="footer">
+            Katrinehaven, Viborg Kommune • Internt onboarding-værktøj
+        </div>
+    </div>
+
+    <!-- Modal til at indlæse sager -->
+    <div class="modal" id="loadCaseModal">
+        <div class="modal-content">
+            <h3>📂 Indlæs eksisterende onboarding</h3>
+            <div class="cases-list" id="casesList"></div>
+            <div class="modal-buttons">
+                <button class="action-btn secondary" id="closeCasesModal">Annuller</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal til at sende velkomst-emails -->
+    <div class="modal" id="emailModal">
+        <div class="modal-content">
+            <h3>📧 Send velkomst-emails</h3>
+            <p style="color: #64748b; margin-bottom: 15px;">Klik på "Send email" ved hver person for at åbne deres velkomst-email. Systemet åbner én email ad gangen for at undgå blokering.</p>
+            <div class="email-list" id="emailList"></div>
+            <div class="modal-buttons">
+                <button class="action-btn secondary" id="closeEmailModal">Luk</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datastruktur for alle opgaver
+        const tasksData = [
+            {
+                section: "Før opstart",
+                badge: "Forberedelse",
+                color: "pre-start",
+                tasks: [
+                    { title: "Oprettelse i SD", details: "Ny medarbejder oprettes i SD-systemet", responsible: "Leder" },
+                    { title: "Udarbejdelse af arbejdsplan", details: "Arbejdstidsplanlæggerne udarbejder arbejdsplan. Sendes til teamleder, som udsender til ny medarbejder.", responsible: "Arbejdstidsplanlægger" },
+                    { title: "Velkomstbrev, blomst og arbejdsplan sendt", details: "Teamleder sender velkomstbrev, blomst og arbejdsplan til ny medarbejder", responsible: "Leder" },
+                    { title: "IT-adgange modtaget og videresendt", details: "Modtagelse af IT-adgange samt videresendelse til mentor", responsible: "Leder" },
+                    { title: "Klargøring af modtagelse", details: "Opsættelse af \"velkommen til\" skilt og sikre at klynge er informeret om ny medarbejder", responsible: "Leder" }
+                ]
+            },
+            {
+                section: "🎉 Dag 1 (10:00-15:00)",
+                badge: "Første dag",
+                color: "",
+                tasks: [
+                    { title: "Modtagelse af teamleder (kl. 10:00-11:00)", details: "Rundvisning i Katrinehaven<br>Udlevering af nøgler, VP-navn og kode og intropapir<br>Gennemgang af: Ambulancebrev, påklædning inkl. lokal instruks for hygiejniske forholdsregler, tavshedspligt, mobil- og kostpolitik, sygefraværspolitik", responsible: "Leder", time: "1 time" },
+                    { title: "Samtale med arbejdstidsplanlægger (kl. 11:00-11:30)", details: "Installere og vise funktionerne i Loop og MinLøn", responsible: "Arbejdstidsplanlægger", time: "30 min" },
+                    { title: "Modtagelse af mentor (kl. 11:30-15:00)", details: "Hilse på beboerne og spise middagsmad i klyngen<br>Oprettelse af 2-faktor log ind<br>Tilføje relevante Teamskanaler<br>Vise funktionerne i TeamEffect<br>Vise Outlook<br>Flytte Nexus i proceslinjen<br>Evt. opsætning af iPad<br>Gennemgang af beboerne i klynge jf. klyngens eget introprogram", responsible: "Mentor", time: "3½ time" }
+                ]
+            },
+            {
+                section: "📚 Uge 2",
+                badge: "Læring",
+                color: "",
+                tasks: [
+                    { title: "Tid med forflytningsvejleder", details: "Gerne en hel introdag med forflytningsvejleder<br>Vise forflytningsbeskrivelser i Nexus<br>Understøttelse i brugen af hjælpemidler i klyngen", responsible: "Forflytningsvejleder", time: "1 time+" },
+                    { title: "Intern Nexus undervisning (kl. 8:30-15:00)", details: "Afholdes den 2. torsdag hver måned<br>08:30-10:00: E-læring magtanvendelse<br>10:00-11:30: Intro af en sundhedsfaglig medarbejder<br>12:00-15:00: Intro til Nexus/dokumentation<br><strong>OBS: Tilmelding i Teamskanalen \"Intern undervisning\"</strong>", responsible: "Katrinehaven", time: "6½ time", date: "2. torsdag hver md." }
+                ]
+            },
+            {
+                section: "💊 Uge 3",
+                badge: "Medicin",
+                color: "",
+                tasks: [
+                    { title: "Intern medicinintro", details: "Konkret gennemgang af medicin der udleveres til klyngens beboere<br>1 time sammen med klyngens sundhedsfaglige medarbejdere på en \"dispenseringsdag\"<br><strong>OBS: Dette skal være EFTER den interne undervisning</strong>", responsible: "Medicinansvarlig", time: "1 time" }
+                ]
+            },
+            {
+                section: "🏥 Uge 4",
+                badge: "AMR",
+                color: "",
+                tasks: [
+                    { title: "Intro med AMR", details: "Planlægges på den tilknyttede AMR's AMR-dag", responsible: "AMR", time: "1½ time" }
+                ]
+            },
+            {
+                section: "🔄 Uge 5",
+                badge: "Opfølgning",
+                color: "",
+                tasks: [
+                    { title: "Opfølgning med mentor", details: "Intro til busserne<br>Hvordan går det i klynge?<br>Opfølgning på: Døgnrytmeplaner, sundhedsfaglig dokumentation, socialfaglig dokumentation, delmål og SMART-metoden, KRAP/LA2u, adgangsforhold og andre aftaler", responsible: "Mentor", time: "2 timer" }
+                ]
+            },
+            {
+                section: "👔 Uge 6",
+                badge: "Ledersamtale",
+                color: "",
+                tasks: [
+                    { title: "Opfølgning med teamleder", details: "Trivsel - Hvordan går det?<br>Gennemgang af introprogrammet, hvor langt er medarbejderen<br>Hvilke kurser har medarbejderen været på, og hvilke mangler?<br>Gennemgang af om der mangler introer eller behov for flere<br>Opfølgning ambulancebrev<br>Ønsker medarbejderen kontakt ved fund af døde beboere i klyngen?", responsible: "Leder", time: "1 time" }
+                ]
+            },
+            {
+                section: "🔄 Uge 7",
+                badge: "Forflytning",
+                color: "",
+                tasks: [
+                    { title: "Tid med forflytningsvejleder", details: "Godkendelse i forflytninger hos konkrete beboere med forflytningsvejleder", responsible: "Forflytningsvejleder", time: "1 time" }
+                ]
+            },
+            {
+                section: "🏥 Uge 9",
+                badge: "AMR opfølgning",
+                color: "",
+                tasks: [
+                    { title: "Opfølgning med AMR", details: "Samtale 2 med AMR på en AMR-dag", responsible: "AMR", time: "1½ time" }
+                ]
+            },
+            {
+                section: "🔄 Uge 10",
+                badge: "Mentor opfølgning",
+                color: "",
+                tasks: [
+                    { title: "Opfølgning med mentor", details: "Hvordan går det i klynge?<br>Opfølgning på: Døgnrytmeplaner, sundhedsfaglig dokumentation, socialfaglig dokumentation, delmål og SMART-metoden, KRAP/LA2u, adgangsforhold og andre aftaler", responsible: "Mentor", time: "30 min" }
+                ]
+            },
+            {
+                section: "✅ Uge 12",
+                badge: "Afslutning",
+                color: "",
+                tasks: [
+                    { title: "Opfølgende samtale med leder", details: "Sende MUS-samtale skema og afhold MUS-samtale<br>Samt sikre at medarbejderen er igennem introprogrammet<br>Programmet lægges på P-sag", responsible: "Leder", time: "1 time" }
+                ]
+            },
+            {
+                section: "🎓 Eksterne kurser (Tilmeldes løbende)",
+                badge: "Kurser",
+                color: "external-courses",
+                tasks: [
+                    { title: "Intro til dokumentationspraksis på socialområdet", details: "Tilmelding: Introduktionsundervisning Socialområdet | Viborg Kommune<br>1. dag: Webinar 2 timer<br>2. dag: 7 timers undervisning<br>3. dag: 4 timers undervisning", responsible: "Eksternt", time: "3 dage" },
+                    { title: "Forflytningskursus (hvis relevant)", details: "Tilmelding: Forflytningsundervisning | Viborg Kommune<br>Spørg teamleder om relevans<br>1 dag: 5 timer", responsible: "Eksternt", time: "1 dag" },
+                    { title: "Kompetencegivende medicinkursus", details: "Tilmelding: Kompetencegivende medicinundervisning på Socialområdet | Viborg Kommune<br>1 dags kursus ved tilkald (muligvis også flex - Spørg teamleder)<br>3 dags kursus ved fast medarbejdere<br>Alle dage kl. 8-15", responsible: "Eksternt", time: "1-3 dage" },
+                    { title: "Intro til Handicap Viborg", details: "Tilmelding: Introduktion til Viborg handicap | Viborg Kommune<br>1 dag: 5 timer", responsible: "Eksternt", time: "1 dag" }
+                ]
+            }
+        ];
+
+        let currentCaseId = null;
+        let totalTasks = 0;
+        let autoSaveTimeout = null;
+        
+        // URL til hjemmesiden - OPDATER DENNE NÅR DU HAR ET DOMÆNE
+        const ONBOARDING_URL = 'https://viborgdk.sharepoint.com/sites/INT-Katrinehaven/Delte%20dokumenter/Forms/AllItems.aspx?FolderCTID=0x012000B9F4BA53A3D2374DBD204C32A4B23908&id=%2Fsites%2FINT%2DKatrinehaven%2FDelte%20dokumenter%2FOnboarding' ; // Bruger nuværende URL som standard
+
+        // Beregn samlet antal opgaver
+        tasksData.forEach(section => {
+            totalTasks += section.tasks.length;
+        });
+
+        // Generer unikt sagsnummer
+        function generateCaseNumber() {
+            const year = new Date().getFullYear();
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            return `KH-${year}-${random}`;
+        }
+
+        // Gem data
+        function saveCurrentCase() {
+            if (!currentCaseId) return;
+
+            const caseData = {
+                caseId: currentCaseId,
+                caseNumber: document.getElementById('caseNumber').textContent.replace('Sag: ', ''),
+                employeeName: document.getElementById('employeeName').value,
+                employeeCluster: document.getElementById('employeeCluster').value,
+                startDate: document.getElementById('startDate').value,
+                managerEmail: document.getElementById('managerEmail').value,
+                workPlanner: document.getElementById('workPlanner').value,
+                workPlannerEmail: document.getElementById('workPlannerEmail').value,
+                mentorName: document.getElementById('mentorName').value,
+                mentorEmail: document.getElementById('mentorEmail').value,
+                movementAdvisor: document.getElementById('movementAdvisor').value,
+                movementAdvisorEmail: document.getElementById('movementAdvisorEmail').value,
+                amrName: document.getElementById('amrName').value,
+                amrEmail: document.getElementById('amrEmail').value,
+                medicineResponsible: document.getElementById('medicineResponsible').value,
+                medicineResponsibleEmail: document.getElementById('medicineResponsibleEmail').value,
+                tasks: [],
+                hiddenTasks: [],
+                lastModified: new Date().toISOString()
+            };
+
+            // Gem alle opgaver
+            document.querySelectorAll('.task-item').forEach((item, index) => {
+                const checkbox = item.querySelector('.task-checkbox');
+                const taskDate = item.querySelector('.task-date');
+                const empSig = item.querySelector('.employee-signature');
+                const respSig = item.querySelector('.responsible-signature');
+
+                caseData.tasks.push({
+                    checked: checkbox.checked,
+                    date: taskDate ? taskDate.value : '',
+                    employeeSignature: empSig ? empSig.value : '',
+                    responsibleSignature: respSig ? respSig.value : ''
+                });
+
+                // Gem skjulte opgaver
+                if (item.classList.contains('hidden')) {
+                    caseData.hiddenTasks.push(index);
+                }
+            });
+
+            // Gem i memory (da localStorage ikke virker i artifacts)
+            if (!window.onboardingCases) {
+                window.onboardingCases = {};
+            }
+            window.onboardingCases[currentCaseId] = caseData;
+
+            // Vis gem-bekræftelse
+            const indicator = document.getElementById('autoSaveIndicator');
+            indicator.textContent = '✓ Gemt ' + new Date().toLocaleTimeString('da-DK', {hour: '2-digit', minute: '2-digit'});
+            setTimeout(() => {
+                indicator.textContent = '';
+            }, 2000);
+
+            updateCaseSelector();
+        }
+
+        // Auto-gem funktion
+        function autoSave() {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                saveCurrentCase();
+            }, 1000);
+        }
+
+        // Indlæs data
+        function loadCase(caseId) {
+            if (!window.onboardingCases || !window.onboardingCases[caseId]) return;
+
+            const caseData = window.onboardingCases[caseId];
+            currentCaseId = caseId;
+
+            document.getElementById('caseNumber').textContent = 'Sag: ' + caseData.caseNumber;
+            document.getElementById('employeeName').value = caseData.employeeName || '';
+            document.getElementById('employeeCluster').value = caseData.employeeCluster || '';
+            document.getElementById('startDate').value = caseData.startDate || '';
+            document.getElementById('managerEmail').value = caseData.managerEmail || '';
+            document.getElementById('workPlanner').value = caseData.workPlanner || '';
+            document.getElementById('workPlannerEmail').value = caseData.workPlannerEmail || '';
+            document.getElementById('mentorName').value = caseData.mentorName || '';
+            document.getElementById('mentorEmail').value = caseData.mentorEmail || '';
+            document.getElementById('movementAdvisor').value = caseData.movementAdvisor || '';
+            document.getElementById('movementAdvisorEmail').value = caseData.movementAdvisorEmail || '';
+            document.getElementById('amrName').value = caseData.amrName || '';
+            document.getElementById('amrEmail').value = caseData.amrEmail || '';
+            document.getElementById('medicineResponsible').value = caseData.medicineResponsible || '';
+            document.getElementById('medicineResponsibleEmail').value = caseData.medicineResponsibleEmail || '';
+
+            // Indlæs opgaver
+            document.querySelectorAll('.task-item').forEach((item, index) => {
+                if (caseData.tasks[index]) {
+                    const task = caseData.tasks[index];
+                    const checkbox = item.querySelector('.task-checkbox');
+                    const taskDate = item.querySelector('.task-date');
+                    const empSig = item.querySelector('.employee-signature');
+                    const respSig = item.querySelector('.responsible-signature');
+
+                    checkbox.checked = task.checked;
+                    if (task.checked) {
+                        item.classList.add('completed');
+                    }
+                    if (taskDate) taskDate.value = task.date || '';
+                    if (empSig) empSig.value = task.employeeSignature || '';
+                    if (respSig) respSig.value = task.responsibleSignature || '';
+                }
+
+                // Skjul opgaver der var skjult
+                if (caseData.hiddenTasks && caseData.hiddenTasks.includes(index)) {
+                    item.classList.add('hidden');
+                } else {
+                    item.classList.remove('hidden');
+                }
+            });
+
+            updateProgress();
+            document.getElementById('caseSelector').value = caseId;
+        }
+
+        // Opret ny sag
+        function createNewCase() {
+            currentCaseId = 'case_' + Date.now();
+            const caseNumber = generateCaseNumber();
+            
+            document.getElementById('caseNumber').textContent = 'Sag: ' + caseNumber;
+            document.getElementById('employeeName').value = '';
+            document.getElementById('employeeCluster').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('managerEmail').value = '';
+            document.getElementById('workPlanner').value = '';
+            document.getElementById('workPlannerEmail').value = '';
+            document.getElementById('mentorName').value = '';
+            document.getElementById('mentorEmail').value = '';
+            document.getElementById('movementAdvisor').value = '';
+            document.getElementById('movementAdvisorEmail').value = '';
+            document.getElementById('amrName').value = '';
+            document.getElementById('amrEmail').value = '';
+            document.getElementById('medicineResponsible').value = '';
+            document.getElementById('medicineResponsibleEmail').value = '';
+
+            // Nulstil alle opgaver
+            document.querySelectorAll('.task-item').forEach(item => {
+                const checkbox = item.querySelector('.task-checkbox');
+                const taskDate = item.querySelector('.task-date');
+                const empSig = item.querySelector('.employee-signature');
+                const respSig = item.querySelector('.responsible-signature');
+
+                checkbox.checked = false;
+                item.classList.remove('completed');
+                item.classList.remove('hidden');
+                if (taskDate) taskDate.value = '';
+                if (empSig) empSig.value = '';
+                if (respSig) respSig.value = '';
+            });
+
+            saveCurrentCase();
+            updateProgress();
+        }
+
+        // Opdater case selector
+        function updateCaseSelector() {
+            const selector = document.getElementById('caseSelector');
+            selector.innerHTML = '<option value="">Vælg en onboarding...</option>';
+
+            if (window.onboardingCases) {
+                Object.values(window.onboardingCases).forEach(caseData => {
+                    const option = document.createElement('option');
+                    option.value = caseData.caseId;
+                    option.textContent = `${caseData.caseNumber} - ${caseData.employeeName || 'Ikke udfyldt'}`;
+                    selector.appendChild(option);
+                });
+            }
+        }
+
+        // Vis liste af sager
+        function showCasesList() {
+            const casesList = document.getElementById('casesList');
+            casesList.innerHTML = '';
+
+            if (!window.onboardingCases || Object.keys(window.onboardingCases).length === 0) {
+                casesList.innerHTML = '<p style="color: #64748b; text-align: center; padding: 20px;">Ingen gemte onboardinger endnu</p>';
+            } else {
+                Object.values(window.onboardingCases).forEach(caseData => {
+                    const caseItem = document.createElement('div');
+                    caseItem.className = 'case-item';
+                    
+                    const completedTasks = caseData.tasks.filter(t => t.checked).length;
+                    const hiddenTasksCount = caseData.hiddenTasks ? caseData.hiddenTasks.length : 0;
+                    const visibleTasksCount = totalTasks - hiddenTasksCount;
+                    const lastModified = new Date(caseData.lastModified).toLocaleDateString('da-DK');
+                    
+                    caseItem.innerHTML = `
+                        <button class="delete-case-btn" data-case-id="${caseData.caseId}" title="Slet denne onboarding">🗑️ Slet</button>
+                        <div class="case-item-header">
+                            <span class="case-item-number">${caseData.caseNumber}</span>
+                            <span class="case-item-date">${lastModified}</span>
+                        </div>
+                        <div class="case-item-name">${caseData.employeeName || 'Ikke udfyldt'} - ${caseData.employeeCluster || 'Ingen klynge'}</div>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 5px;">${completedTasks}/${visibleTasksCount} opgaver gennemført</div>
+                    `;
+                    
+                    // Klik på selve caseItem for at indlæse
+                    caseItem.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('delete-case-btn')) {
+                            loadCase(caseData.caseId);
+                            document.getElementById('loadCaseModal').classList.remove('show');
+                        }
+                    });
+                    
+                    casesList.appendChild(caseItem);
+                });
+
+                // Tilføj event listeners til slet-knapper
+                document.querySelectorAll('.delete-case-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const caseId = this.getAttribute('data-case-id');
+                        const caseData = window.onboardingCases[caseId];
+                        
+                        if (confirm(`Er du sikker på at du vil slette onboarding:\n${caseData.caseNumber} - ${caseData.employeeName}?\n\nDette kan ikke fortrydes!`)) {
+                            delete window.onboardingCases[caseId];
+                            updateCaseSelector();
+                            showCasesList(); // Genindlæs listen
+                            
+                            // Hvis det er den aktuelle sag, opret en ny
+                            if (currentCaseId === caseId) {
+                                createNewCase();
+                            }
+                        }
+                    });
+                });
+            }
+
+            document.getElementById('loadCaseModal').classList.add('show');
+        }
+
+        // Generer HTML for opgaver
+        function renderTasks() {
+            const content = document.getElementById('tasksContent');
+            let taskIndex = 0;
+
+            tasksData.forEach(section => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = `week-section ${section.color}`;
+                
+                sectionDiv.innerHTML = `
+                    <div class="week-header">
+                        <h2>${section.section}</h2>
+                        <div class="week-badge">${section.badge}</div>
+                    </div>
+                `;
+
+                section.tasks.forEach(task => {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.className = 'task-item';
+                    taskDiv.setAttribute('data-task', taskIndex);
+
+                    let metaBadges = `<span class="meta-badge responsible">👤 ${task.responsible}</span>`;
+                    if (task.time) metaBadges += `<span class="meta-badge time">⏱️ ${task.time}</span>`;
+                    if (task.date) metaBadges += `<span class="meta-badge date">📅 ${task.date}</span>`;
+
+                    taskDiv.innerHTML = `
+                        <button class="delete-task-btn" title="Fjern denne opgave">✕ Fjern</button>
+                        <div class="task-header">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <div class="task-title">${task.title}</div>
+                                <div class="task-details">${task.details}</div>
+                                <div class="task-meta">${metaBadges}</div>
+                                <div class="date-input-wrapper">
+                                    <label>Gennemført dato:</label>
+                                    <input type="date" class="task-date">
+                                </div>
+                                <div class="signature-section">
+                                    <h4>✍️ Underskrifter</h4>
+                                    <div class="signature-grid">
+                                        <div class="signature-field">
+                                            <label>Medarbejderens initialer:</label>
+                                            <input type="text" class="employee-signature" placeholder="Fx ABC" maxlength="5">
+                                        </div>
+                                        <div class="signature-field">
+                                            <label>Ansvarlig (${task.responsible}) initialer:</label>
+                                            <input type="text" class="responsible-signature" placeholder="Fx XYZ" maxlength="5">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    sectionDiv.appendChild(taskDiv);
+                    taskIndex++;
+                });
+
+                content.appendChild(sectionDiv);
+            });
+
+            // Tilføj event listeners
+            setupEventListeners();
+        }
+
+        // Opdater progress (global funktion)
+        function updateProgress() {
+            const allTasks = document.querySelectorAll('.task-item:not(.hidden)');
+            const completed = document.querySelectorAll('.task-item:not(.hidden) .task-checkbox:checked').length;
+            const visibleTaskCount = allTasks.length;
+            const percentage = visibleTaskCount > 0 ? Math.round((completed / visibleTaskCount) * 100) : 0;
+            
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const submitBtn = document.getElementById('submitBtn');
+            const sendWelcomeBtn = document.getElementById('sendWelcomeBtn');
+            
+            const employeeName = document.getElementById('employeeName');
+            const employeeCluster = document.getElementById('employeeCluster');
+            const startDate = document.getElementById('startDate');
+            const managerEmail = document.getElementById('managerEmail');
+            const workPlanner = document.getElementById('workPlanner');
+            const workPlannerEmail = document.getElementById('workPlannerEmail');
+            const mentorName = document.getElementById('mentorName');
+            const mentorEmail = document.getElementById('mentorEmail');
+            const movementAdvisor = document.getElementById('movementAdvisor');
+            const movementAdvisorEmail = document.getElementById('movementAdvisorEmail');
+            const amrName = document.getElementById('amrName');
+            const amrEmail = document.getElementById('amrEmail');
+            const medicineResponsible = document.getElementById('medicineResponsible');
+            const medicineResponsibleEmail = document.getElementById('medicineResponsibleEmail');
+            
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '%';
+            progressText.textContent = `${completed} af ${visibleTaskCount} aktiviteter gennemført`;
+            
+            const allCompleted = completed === visibleTaskCount && visibleTaskCount > 0;
+            const allFieldsFilled = employeeName.value && employeeCluster.value && startDate.value && 
+                                   managerEmail.value && workPlanner.value && workPlannerEmail.value &&
+                                   mentorName.value && mentorEmail.value && movementAdvisor.value && 
+                                   movementAdvisorEmail.value && amrName.value && amrEmail.value &&
+                                   medicineResponsible.value && medicineResponsibleEmail.value;
+            
+            submitBtn.disabled = !(allCompleted && allFieldsFilled);
+            sendWelcomeBtn.disabled = !allFieldsFilled;
+        }
+
+        function setupEventListeners() {
+            const checkboxes = document.querySelectorAll('.task-checkbox');
+            const submitBtn = document.getElementById('submitBtn');
+            const successMessage = document.getElementById('successMessage');
+            
+            const employeeName = document.getElementById('employeeName');
+            const employeeCluster = document.getElementById('employeeCluster');
+            const startDate = document.getElementById('startDate');
+            const managerEmail = document.getElementById('managerEmail');
+            const workPlanner = document.getElementById('workPlanner');
+            const workPlannerEmail = document.getElementById('workPlannerEmail');
+            const mentorName = document.getElementById('mentorName');
+            const mentorEmail = document.getElementById('mentorEmail');
+            const movementAdvisor = document.getElementById('movementAdvisor');
+            const movementAdvisorEmail = document.getElementById('movementAdvisorEmail');
+            const amrName = document.getElementById('amrName');
+            const amrEmail = document.getElementById('amrEmail');
+            const medicineResponsible = document.getElementById('medicineResponsible');
+            const medicineResponsibleEmail = document.getElementById('medicineResponsibleEmail');
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const item = this.closest('.task-item');
+                    if (this.checked) {
+                        item.classList.add('completed');
+                    } else {
+                        item.classList.remove('completed');
+                    }
+                    updateProgress();
+                    autoSave();
+                });
+            });
+
+            // Auto-gem ved ændringer
+            [employeeName, employeeCluster, startDate, managerEmail, workPlanner, workPlannerEmail, 
+             mentorName, mentorEmail, movementAdvisor, movementAdvisorEmail, amrName, amrEmail,
+             medicineResponsible, medicineResponsibleEmail].forEach(field => {
+                field.addEventListener('input', () => {
+                    updateProgress();
+                    autoSave();
+                });
+            });
+
+            // Auto-gem ved underskrifter og datoer
+            document.querySelectorAll('.task-date, .employee-signature, .responsible-signature').forEach(field => {
+                field.addEventListener('input', autoSave);
+            });
+
+            // Tilføj event listeners til slet-knapper
+            document.querySelectorAll('.delete-task-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const taskItem = this.closest('.task-item');
+                    const taskTitle = taskItem.querySelector('.task-title').textContent;
+                    
+                    if (confirm(`Er du sikker på at du vil fjerne opgaven:\n"${taskTitle}"?\n\nOpgaven kan gendannes ved at oprette en ny onboarding.`)) {
+                        taskItem.classList.add('hidden');
+                        updateProgress();
+                        autoSave();
+                    }
+                });
+            });
+
+            submitBtn.addEventListener('click', function() {
+                const completedTasks = [];
+                
+                document.querySelectorAll('.task-item').forEach((item, index) => {
+                    const checkbox = item.querySelector('.task-checkbox');
+                    if (checkbox.checked) {
+                        const title = item.querySelector('.task-title').textContent;
+                        const date = item.querySelector('.task-date').value || 'Ikke angivet';
+                        const empSig = item.querySelector('.employee-signature').value || 'Ikke udfyldt';
+                        const respSig = item.querySelector('.responsible-signature').value || 'Ikke udfyldt';
+                        
+                        completedTasks.push({
+                            title: title,
+                            date: date,
+                            employeeSignature: empSig,
+                            responsibleSignature: respSig
+                        });
+                    }
+                });
+
+                let taskList = '';
+                completedTasks.forEach((task, i) => {
+                    taskList += `${i + 1}. ${task.title}\n   Dato: ${task.date}\n   Medarbejder: ${task.employeeSignature} | Ansvarlig: ${task.responsibleSignature}\n\n`;
+                });
+
+                const caseNumber = document.getElementById('caseNumber').textContent.replace('Sag: ', '');
+
+                const emailBody = `
+ONBOARDING GENNEMFØRT - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+═══════════════════════════════════════
+MEDARBEJDERINFORMATION
+═══════════════════════════════════════
+Navn: ${employeeName.value}
+Klynge/Afdeling: ${employeeCluster.value}
+Startdato: ${startDate.value}
+Gennemført dato: ${new Date().toLocaleDateString('da-DK')}
+
+Arbejdstidsplanlægger: ${workPlanner.value} (${workPlannerEmail.value})
+Mentor: ${mentorName.value} (${mentorEmail.value})
+Forflytningsvejleder: ${movementAdvisor.value} (${movementAdvisorEmail.value})
+AMR: ${amrName.value} (${amrEmail.value})
+Medicinansvarlig: ${medicineResponsible.value} (${medicineResponsibleEmail.value})
+
+═══════════════════════════════════════
+GENNEMFØRTE AKTIVITETER (${completedTasks.length}/${totalTasks})
+═══════════════════════════════════════
+
+${taskList}
+
+═══════════════════════════════════════
+Dette er en automatisk besked fra Katrinehavens onboarding-system.
+Programmet skal nu lægges på P-sag.
+                `.trim();
+
+                const subject = `Onboarding gennemført: ${employeeName.value} - ${caseNumber}`;
+                const mailtoLink = `mailto:${managerEmail.value}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+                
+                window.location.href = mailtoLink;
+                
+                successMessage.classList.add('show');
+                submitBtn.disabled = true;
+                submitBtn.textContent = '✓ Sendt til leder';
+                submitBtn.style.background = '#10b981';
+            });
+
+            updateProgress();
+        }
+
+        // Event listeners for knapper
+        document.getElementById('newCaseBtn').addEventListener('click', createNewCase);
+        document.getElementById('loadCaseBtn').addEventListener('click', showCasesList);
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            saveCurrentCase();
+            alert('Onboarding gemt!');
+        });
+        document.getElementById('closeCasesModal').addEventListener('click', () => {
+            document.getElementById('loadCaseModal').classList.remove('show');
+        });
+        document.getElementById('closeEmailModal').addEventListener('click', () => {
+            document.getElementById('emailModal').classList.remove('show');
+        });
+        document.getElementById('caseSelector').addEventListener('change', (e) => {
+            if (e.target.value) {
+                loadCase(e.target.value);
+            }
+        });
+
+        // Send velkomst-email til alle ansvarlige
+        document.getElementById('sendWelcomeBtn').addEventListener('click', () => {
+            const employeeName = document.getElementById('employeeName').value;
+            const employeeCluster = document.getElementById('employeeCluster').value;
+            const startDate = document.getElementById('startDate').value;
+            const caseNumber = document.getElementById('caseNumber').textContent.replace('Sag: ', '');
+            
+            const managerEmail = document.getElementById('managerEmail').value;
+            const workPlanner = document.getElementById('workPlanner').value;
+            const workPlannerEmail = document.getElementById('workPlannerEmail').value;
+            const mentorName = document.getElementById('mentorName').value;
+            const mentorEmail = document.getElementById('mentorEmail').value;
+            const movementAdvisor = document.getElementById('movementAdvisor').value;
+            const movementAdvisorEmail = document.getElementById('movementAdvisorEmail').value;
+            const amrName = document.getElementById('amrName').value;
+            const amrEmail = document.getElementById('amrEmail').value;
+            const medicineResponsible = document.getElementById('medicineResponsible').value;
+            const medicineResponsibleEmail = document.getElementById('medicineResponsibleEmail').value;
+
+            // Find opgaver for hver ansvarlig
+            const responsibilities = {
+                'Leder': [],
+                'Arbejdstidsplanlægger': [],
+                'Mentor': [],
+                'Forflytningsvejleder': [],
+                'Medicinansvarlig': [],
+                'AMR': [],
+                'Katrinehaven': [],
+                'Eksternt': []
+            };
+
+            tasksData.forEach(section => {
+                section.tasks.forEach(task => {
+                    if (responsibilities[task.responsible]) {
+                        responsibilities[task.responsible].push(task.title);
+                    }
+                });
+            });
+
+            // Generer email til teamleder
+            let managerBody = `
+NY MEDARBEJDER STARTER - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+═══════════════════════════════════════
+MEDARBEJDERINFORMATION
+═══════════════════════════════════════
+Navn: ${employeeName}
+Klynge/Afdeling: ${employeeCluster}
+Startdato: ${startDate}
+
+═══════════════════════════════════════
+ANSVARLIGE FOR ONBOARDING
+═══════════════════════════════════════
+Arbejdstidsplanlægger: ${workPlanner} (${workPlannerEmail})
+Mentor: ${mentorName} (${mentorEmail})
+Forflytningsvejleder: ${movementAdvisor} (${movementAdvisorEmail})
+AMR: ${amrName} (${amrEmail})
+Medicinansvarlig: ${medicineResponsible} (${medicineResponsibleEmail})
+
+═══════════════════════════════════════
+DINE ANSVARSOMRÅDER SOM TEAMLEDER
+═══════════════════════════════════════
+${responsibilities['Leder'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
+
+═══════════════════════════════════════
+Dette er en automatisk besked fra Katrinehavens onboarding-system.
+Alle ansvarlige har modtaget en tilsvarende email med deres opgaver.
+            `.trim();
+
+            // Generer email til arbejdstidsplanlægger
+            let plannerBody = `
+NY MEDARBEJDER STARTER - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+Kære ${workPlanner},
+
+En ny medarbejder starter hos Katrinehaven, og du har fået tildelt ansvaret for dele af introforløbet.
+
+MEDARBEJDERINFORMATION:
+Navn: ${employeeName}
+Klynge/Afdeling: ${employeeCluster}
+Startdato: ${startDate}
+Teamleder: ${managerEmail}
+
+DINE ANSVARSOMRÅDER:
+${responsibilities['Arbejdstidsplanlægger'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
+
+Kontakt teamleder hvis du har spørgsmål.
+
+Med venlig hilsen
+Katrinehaven onboarding-system
+            `.trim();
+
+            // Generer email til mentor
+            let mentorBody = `
+NY MEDARBEJDER STARTER - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+Kære ${mentorName},
+
+En ny medarbejder starter hos Katrinehaven, og du er blevet udpeget som mentor.
+
+MEDARBEJDERINFORMATION:
+Navn: ${employeeName}
+Klynge/Afdeling: ${employeeCluster}
+Startdato: ${startDate}
+Teamleder: ${managerEmail}
+
+DINE ANSVARSOMRÅDER SOM MENTOR:
+${responsibilities['Mentor'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
+
+Kontakt teamleder hvis du har spørgsmål.
+
+Med venlig hilsen
+Katrinehaven onboarding-system
+            `.trim();
+
+            // Generer email til forflytningsvejleder
+            let movementBody = `
+NY MEDARBEJDER STARTER - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+Kære ${movementAdvisor},
+
+En ny medarbejder starter hos Katrinehaven, og du har fået tildelt ansvaret for forflytningsintro.
+
+MEDARBEJDERINFORMATION:
+Navn: ${employeeName}
+Klynge/Afdeling: ${employeeCluster}
+Startdato: ${startDate}
+Teamleder: ${managerEmail}
+
+DINE ANSVARSOMRÅDER:
+${responsibilities['Forflytningsvejleder'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
+
+Kontakt teamleder hvis du har spørgsmål.
+
+Med venlig hilsen
+Katrinehaven onboarding-system
+            `.trim();
+
+            // Generer email til AMR
+            let amrBody = `
+NY MEDARBEJDER STARTER - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+Kære ${amrName},
+
+En ny medarbejder starter hos Katrinehaven, og du har fået tildelt ansvaret for AMR-intro.
+
+MEDARBEJDERINFORMATION:
+Navn: ${employeeName}
+Klynge/Afdeling: ${employeeCluster}
+Startdato: ${startDate}
+Teamleder: ${managerEmail}
+
+DINE ANSVARSOMRÅDER:
+${responsibilities['AMR'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
+
+Kontakt teamleder hvis du har spørgsmål.
+
+Med venlig hilsen
+Katrinehaven onboarding-system
+            `.trim();
+
+            // Generer email til medicinansvarlig
+            let medicineBody = `
+NY MEDARBEJDER STARTER - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+Kære ${medicineResponsible},
+
+En ny medarbejder starter hos Katrinehaven, og du har fået tildelt ansvaret for medicinintro.
+
+MEDARBEJDERINFORMATION:
+Navn: ${employeeName}
+Klynge/Afdeling: ${employeeCluster}
+Startdato: ${startDate}
+Teamleder: ${managerEmail}
+
+DINE ANSVARSOMRÅDER:
+${responsibilities['Medicinansvarlig'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
+
+Kontakt teamleder hvis du har spørgsmål.
+
+Med venlig hilsen
+Katrinehaven onboarding-system
+            `.trim();
+
+            const subject = `Ny medarbejder starter: ${employeeName} - ${caseNumber}`;
+            const allEmails = [
+                { email: managerEmail, name: 'Teamleder', body: managerBody, tasks: responsibilities['Leder'] },
+                { email: workPlannerEmail, name: workPlanner + ' (Arbejdstidsplanlægger)', body: plannerBody, tasks: responsibilities['Arbejdstidsplanlægger'] },
+                { email: mentorEmail, name: mentorName + ' (Mentor)', body: mentorBody, tasks: responsibilities['Mentor'] },
+                { email: movementAdvisorEmail, name: movementAdvisor + ' (Forflytningsvejleder)', body: movementBody, tasks: responsibilities['Forflytningsvejleder'] },
+                { email: amrEmail, name: amrName + ' (AMR)', body: amrBody, tasks: responsibilities['AMR'] },
+                { email: medicineResponsibleEmail, name: medicineResponsible + ' (Medicinansvarlig)', body: medicineBody, tasks: responsibilities['Medicinansvarlig'] }
+            ];
+
+            // Vis modal med email-liste
+            const emailList = document.getElementById('emailList');
+            emailList.innerHTML = '';
+
+            allEmails.forEach((recipient, index) => {
+                const recipientDiv = document.createElement('div');
+                recipientDiv.className = 'email-recipient';
+                
+                const tasksList = recipient.tasks.length > 0 
+                    ? `<ul class="email-tasks">${recipient.tasks.slice(0, 3).map(t => `<li>${t}</li>`).join('')}${recipient.tasks.length > 3 ? `<li>... og ${recipient.tasks.length - 3} flere</li>` : ''}</ul>`
+                    : '<p style="font-size: 12px; color: #94a3b8; margin-top: 5px;">Ingen specifikke opgaver</p>';
+                
+                recipientDiv.innerHTML = `
+                    <div class="email-recipient-header">
+                        <div>
+                            <div class="email-recipient-name">${recipient.name}</div>
+                            <div class="email-recipient-email">${recipient.email}</div>
+                        </div>
+                        <button class="email-send-btn" data-index="${index}">📧 Send email</button>
+                    </div>
+                    ${tasksList}
+                `;
+                
+                emailList.appendChild(recipientDiv);
+            });
+
+            // Tilføj event listeners til send-knapper
+            document.querySelectorAll('.email-send-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    const recipient = allEmails[index];
+                    const mailtoLink = `mailto:${recipient.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(recipient.body)}`;
+                    window.open(mailtoLink, '_blank');
+                    
+                    this.textContent = '✓ Sendt';
+                    this.classList.add('sent');
+                    this.disabled = true;
+                });
+            });
+
+            document.getElementById('emailModal').classList.add('show');
+        });
+
+        // Initialiser
+        renderTasks();
+        createNewCase();
+    </script>
+</body>
+</html>
