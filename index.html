@@ -707,6 +707,7 @@
             <button class="action-btn primary" id="newCaseBtn">+ Ny Onboarding</button>
             <button class="action-btn secondary" id="loadCaseBtn">📂 Indlæs Onboarding</button>
             <button class="action-btn success" id="saveBtn">💾 Gem</button>
+            <button class="action-btn" id="deleteCaseBtn" title="Slet denne onboarding">🗑️ Slet</button>
             <select class="case-selector" id="caseSelector">
                 <option value="">Vælg en onboarding...</option>
             </select>
@@ -978,6 +979,32 @@
         function saveCurrentCase() {
             if (!currentCaseId) return;
 
+            // Prevent saving completely empty cases created by auto-save.
+            // If no identifying fields are filled and no tasks checked, skip saving.
+            const possibleFields = [
+                document.getElementById('employeeName').value,
+                document.getElementById('employeeCluster').value,
+                document.getElementById('startDate').value,
+                document.getElementById('managerEmail').value,
+                document.getElementById('workPlanner').value,
+                document.getElementById('workPlannerEmail').value,
+                document.getElementById('mentorName').value,
+                document.getElementById('mentorEmail').value,
+                document.getElementById('movementAdvisor').value,
+                document.getElementById('movementAdvisorEmail').value,
+                document.getElementById('amrName').value,
+                document.getElementById('amrEmail').value,
+                document.getElementById('medicineResponsible').value,
+                document.getElementById('medicineResponsibleEmail').value
+            ];
+            const anyFieldFilled = possibleFields.some(v => v && v.trim().length > 0);
+            const anyTaskChecked = !!document.querySelector('.task-checkbox:checked');
+            if (!anyFieldFilled && !anyTaskChecked) {
+                // nothing meaningful to save
+                return;
+            }
+
+
             const caseData = {
                 caseId: currentCaseId,
                 caseNumber: document.getElementById('caseNumber').textContent.replace('Sag: ', ''),
@@ -1117,7 +1144,30 @@
             saveCurrentCase();
         }
 
-        function updateCaseSelector() {
+
+        // Delete the currently loaded case (if any) from Firestore
+        function deleteCurrentCase() {
+            if (!currentCaseId) {
+                alert('Ingen onboarding valgt at slette.');
+                return;
+            }
+            if (!confirm('Er du sikker på, at du vil slette denne onboarding? Dette kan ikke fortrydes.')) return;
+            db.collection('onboardings').doc(currentCaseId).delete()
+                .then(() => {
+                    // If deleted, remove selection and create a fresh case
+                    alert('Onboarding slettet.');
+                    currentCaseId = null;
+                    updateCaseSelector();
+                    createNewCase();
+                })
+                .catch((err) => {
+                    console.error('Sletningsfejl:', err);
+                    alert('Kunne ikke slette onboarding. Se konsollen for fejl.');
+                });
+        }
+
+
+            function updateCaseSelector() {
             const selector = document.getElementById('caseSelector');
             selector.innerHTML = '<option value="">Vælg en onboarding...</option>';
 
@@ -1369,6 +1419,9 @@ ${taskList}`;
         document.getElementById('saveBtn').addEventListener('click', () => {
             saveCurrentCase();
             alert('Gemt!');
+        });
+        document.getElementById('deleteCaseBtn').addEventListener('click', () => {
+            deleteCurrentCase();
         });
         document.getElementById('closeCasesModal').addEventListener('click', () => {
             document.getElementById('loadCaseModal').classList.remove('show');
