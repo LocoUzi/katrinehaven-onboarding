@@ -16,6 +16,19 @@
             box-sizing: border-box;
         }
 
+        /* helper class for screen-reader-only labels */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #4a7c59 0%, #2d5a3d 100%);
@@ -34,7 +47,7 @@
 
         .header {
             background: linear-gradient(rgba(45, 90, 61, 0.85), rgba(45, 90, 61, 0.85)),
-                        url('https://github.com/LocoUzi/katrinehaven-onboarding/blob/main/katrinehaven.jpg?raw=true') center/cover;
+                        url('https://i.imgur.com/placeholder.jpg') center/cover;
             color: white;
             padding: 60px 30px;
             text-align: center;
@@ -63,6 +76,7 @@
             font-size: 14px;
             font-weight: 600;
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* Safari fallback */
         }
 
         .action-bar {
@@ -668,6 +682,22 @@
             margin-left: auto;
         }
 
+        /* layout for welcome-email button wrapper */
+        .send-welcome-wrapper {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .send-welcome-btn {
+            padding: 12px 30px;
+            font-size: 15px;
+        }
+
+        .submit-note {
+            margin-top: 10px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
         @media print {
             body {
                 background: white;
@@ -707,7 +737,8 @@
             <button class="action-btn primary" id="newCaseBtn">+ Ny Onboarding</button>
             <button class="action-btn secondary" id="loadCaseBtn">📂 Indlæs Onboarding</button>
             <button class="action-btn success" id="saveBtn">💾 Gem</button>
-            <select class="case-selector" id="caseSelector">
+            <label for="caseSelector" class="visually-hidden">Vælg onboarding</label>
+            <select class="case-selector" id="caseSelector" aria-label="Vælg onboarding">
                 <option value="">Vælg en onboarding...</option>
             </select>
             <span class="auto-save-indicator" id="autoSaveIndicator"></span>
@@ -780,8 +811,8 @@
                     <input type="email" id="medicineResponsibleEmail" placeholder="email@viborg.dk" required>
                 </div>
             </div>
-            <div style="margin-top: 20px; text-align: center;">
-                <button class="action-btn success" id="sendWelcomeBtn" disabled style="padding: 12px 30px; font-size: 15px;">
+            <div class="send-welcome-wrapper">
+                <button class="action-btn success send-welcome-btn" id="sendWelcomeBtn" disabled>
                     📧 Send velkomst-email til alle ansvarlige
                 </button>
             </div>
@@ -800,7 +831,7 @@
             <button class="submit-btn" id="submitBtn" disabled>
                 Send til leder
             </button>
-            <p style="margin-top: 10px; color: #64748b; font-size: 13px;">
+            <p class="submit-note">
                 Knappen aktiveres når alle oplysninger er udfyldt og alle opgaver er afkrydsede
             </p>
         </div>
@@ -1231,6 +1262,8 @@
             document.getElementById('sendWelcomeBtn').disabled = !allFieldsFilled;
         }
 
+        let taskCounter = 0;
+
         function renderTasks() {
             const tasksContent = document.getElementById('tasksContent');
             tasksContent.innerHTML = '';
@@ -1248,32 +1281,35 @@
                     const taskDiv = document.createElement('div');
                     taskDiv.className = 'task-item';
 
+                    const uniqueId = 'task-' + (taskCounter++);
+
                     let metaBadges = `<span class="meta-badge responsible">👤 ${task.responsible}</span>`;
                     if (task.time) metaBadges += `<span class="meta-badge time">⏱️ ${task.time}</span>`;
                     if (task.date) metaBadges += `<span class="meta-badge date">📅 ${task.date}</span>`;
 
                     taskDiv.innerHTML = `
-                        <button class="delete-task-btn">✕ Fjern</button>
+                        <button class="delete-task-btn" aria-label="Fjern opgave">✕ Fjern</button>
                         <div class="task-header">
-                            <input type="checkbox" class="task-checkbox">
+                            <input type="checkbox" class="task-checkbox" id="check-${uniqueId}">
+                            <label for="check-${uniqueId}" class="visually-hidden">Marker opgave som fuldført</label>
                             <div class="task-content">
                                 <div class="task-title">${task.title}</div>
                                 <div class="task-details">${task.details}</div>
                                 <div class="task-meta">${metaBadges}</div>
                                 <div class="date-input-wrapper">
-                                    <label>Gennemført dato:</label>
-                                    <input type="date" class="task-date">
+                                    <label for="date-${uniqueId}">Gennemført dato:</label>
+                                    <input type="date" class="task-date" id="date-${uniqueId}" aria-label="Gennemført dato">
                                 </div>
                                 <div class="signature-section">
                                     <h4>✍️ Underskrifter</h4>
                                     <div class="signature-grid">
                                         <div class="signature-field">
-                                            <label>Medarbejderens initialer:</label>
-                                            <input type="text" class="employee-signature" placeholder="Fx ABC" maxlength="5">
+                                            <label for="emp-${uniqueId}">Medarbejderens initialer:</label>
+                                            <input type="text" class="employee-signature" id="emp-${uniqueId}" placeholder="Fx ABC" maxlength="5" aria-label="Medarbejderens initialer">
                                         </div>
                                         <div class="signature-field">
-                                            <label>Ansvarlig (${task.responsible}) initialer:</label>
-                                            <input type="text" class="responsible-signature" placeholder="Fx XYZ" maxlength="5">
+                                            <label for="resp-${uniqueId}">Ansvarlig (${task.responsible}) initialer:</label>
+                                            <input type="text" class="responsible-signature" id="resp-${uniqueId}" placeholder="Fx XYZ" maxlength="5" aria-label="Ansvarlig initialer">
                                         </div>
                                     </div>
                                 </div>
@@ -1379,288 +1415,7 @@ ${taskList}`;
 
         // Send velkomst-emails
         document.getElementById('sendWelcomeBtn').addEventListener('click', () => {
-            const employeeName = document.getElementById('employeeName').value;
-            const employeeCluster = document.getElementById('employeeCluster').value;
-            const startDate = document.getElementById('startDate').value;
-            const caseNumber = document.getElementById('caseNumber').textContent.replace('Sag: ', '');
-            
-            const managerEmail = document.getElementById('managerEmail').value;
-            const workPlanner = document.getElementById('workPlanner').value;
-            const workPlannerEmail = document.getElementById('workPlannerEmail').value;
-            const mentorName = document.getElementById('mentorName').value;
-            const mentorEmail = document.getElementById('mentorEmail').value;
-            const movementAdvisor = document.getElementById('movementAdvisor').value;
-            const movementAdvisorEmail = document.getElementById('movementAdvisorEmail').value;
-            const amrName = document.getElementById('amrName').value;
-            const amrEmail = document.getElementById('amrEmail').value;
-            const medicineResponsible = document.getElementById('medicineResponsible').value;
-            const medicineResponsibleEmail = document.getElementById('medicineResponsibleEmail').value;
-
-            // Find opgaver for hver ansvarlig
-            const responsibilities = {
-                'Leder': [],
-                'Arbejdstidsplanlægger': [],
-                'Mentor': [],
-                'Forflytningsvejleder': [],
-                'Medicinansvarlig': [],
-                'AMR': [],
-                'Katrinehaven': [],
-                'Eksternt': []
-            };
-
-            tasksData.forEach(section => {
-                section.tasks.forEach(task => {
-                    if (responsibilities[task.responsible]) {
-                        responsibilities[task.responsible].push(task.title);
-                    }
-                });
-            });
-
-            // Generer emails
-            const allEmails = [];
-
-            // Teamleder email
-            let managerBody = `NY MEDARBEJDER STARTER - KATRINEHAVEN
-Sagsnummer: ${caseNumber}
-
-═══════════════════════════════════════
-MEDARBEJDERINFORMATION
-═══════════════════════════════════════
-Navn: ${employeeName}
-Klynge/Afdeling: ${employeeCluster}
-Startdato: ${startDate}
-
-═══════════════════════════════════════
-ANSVARLIGE FOR ONBOARDING
-═══════════════════════════════════════
-Arbejdstidsplanlægger: ${workPlanner} (${workPlannerEmail})
-Mentor: ${mentorName} (${mentorEmail})
-Forflytningsvejleder: ${movementAdvisor} (${movementAdvisorEmail})
-AMR: ${amrName} (${amrEmail})
-Medicinansvarlig: ${medicineResponsible} (${medicineResponsibleEmail})
-
-═══════════════════════════════════════
-DINE ANSVARSOMRÅDER SOM TEAMLEDER
-═══════════════════════════════════════
-${responsibilities['Leder'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
-
-═══════════════════════════════════════
-ÅBEN ONBOARDING-SYSTEM
-═══════════════════════════════════════
-${ONBOARDING_URL}?sag=${encodeURIComponent(caseNumber)}
-
-═══════════════════════════════════════
-Dette er en automatisk besked fra Katrinehavens onboarding-system.`;
-
-            allEmails.push({ 
-                email: managerEmail, 
-                name: 'Teamleder', 
-                body: managerBody, 
-                tasks: responsibilities['Leder'] 
-            });
-
-            // Arbejdstidsplanlægger email
-            let plannerBody = `NY MEDARBEJDER STARTER - KATRINEHAVEN
-Sagsnummer: ${caseNumber}
-
-Kære ${workPlanner},
-
-En ny medarbejder starter hos Katrinehaven, og du har fået tildelt ansvaret for dele af introforløbet.
-
-MEDARBEJDERINFORMATION:
-Navn: ${employeeName}
-Klynge/Afdeling: ${employeeCluster}
-Startdato: ${startDate}
-Teamleder: ${managerEmail}
-
-DINE ANSVARSOMRÅDER:
-${responsibilities['Arbejdstidsplanlægger'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
-
-ÅBEN ONBOARDING-SYSTEM:
-${ONBOARDING_URL}?sag=${encodeURIComponent(caseNumber)}
-
-Kontakt teamleder hvis du har spørgsmål.
-
-Med venlig hilsen
-Katrinehaven`;
-
-            allEmails.push({ 
-                email: workPlannerEmail, 
-                name: workPlanner + ' (Arbejdstidsplanlægger)', 
-                body: plannerBody, 
-                tasks: responsibilities['Arbejdstidsplanlægger'] 
-            });
-
-            // Mentor email
-            let mentorBody = `NY MEDARBEJDER STARTER - KATRINEHAVEN
-Sagsnummer: ${caseNumber}
-
-Kære ${mentorName},
-
-En ny medarbejder starter hos Katrinehaven, og du er blevet udpeget som mentor.
-
-MEDARBEJDERINFORMATION:
-Navn: ${employeeName}
-Klynge/Afdeling: ${employeeCluster}
-Startdato: ${startDate}
-Teamleder: ${managerEmail}
-
-DINE ANSVARSOMRÅDER SOM MENTOR:
-${responsibilities['Mentor'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
-
-ÅBEN ONBOARDING-SYSTEM:
-${ONBOARDING_URL}?sag=${encodeURIComponent(caseNumber)}
-
-Kontakt teamleder hvis du har spørgsmål.
-
-Med venlig hilsen
-Katrinehaven`;
-
-            allEmails.push({ 
-                email: mentorEmail, 
-                name: mentorName + ' (Mentor)', 
-                body: mentorBody, 
-                tasks: responsibilities['Mentor'] 
-            });
-
-            // Forflytningsvejleder email
-            let movementBody = `NY MEDARBEJDER STARTER - KATRINEHAVEN
-Sagsnummer: ${caseNumber}
-
-Kære ${movementAdvisor},
-
-En ny medarbejder starter hos Katrinehaven, og du har fået tildelt ansvaret for forflytningsintro.
-
-MEDARBEJDERINFORMATION:
-Navn: ${employeeName}
-Klynge/Afdeling: ${employeeCluster}
-Startdato: ${startDate}
-Teamleder: ${managerEmail}
-
-DINE ANSVARSOMRÅDER:
-${responsibilities['Forflytningsvejleder'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
-
-ÅBEN ONBOARDING-SYSTEM:
-${ONBOARDING_URL}?sag=${encodeURIComponent(caseNumber)}
-
-Kontakt teamleder hvis du har spørgsmål.
-
-Med venlig hilsen
-Katrinehaven`;
-
-            allEmails.push({ 
-                email: movementAdvisorEmail, 
-                name: movementAdvisor + ' (Forflytningsvejleder)', 
-                body: movementBody, 
-                tasks: responsibilities['Forflytningsvejleder'] 
-            });
-
-            // AMR email
-            let amrBody = `NY MEDARBEJDER STARTER - KATRINEHAVEN
-Sagsnummer: ${caseNumber}
-
-Kære ${amrName},
-
-En ny medarbejder starter hos Katrinehaven, og du har fået tildelt ansvaret for AMR-intro.
-
-MEDARBEJDERINFORMATION:
-Navn: ${employeeName}
-Klynge/Afdeling: ${employeeCluster}
-Startdato: ${startDate}
-Teamleder: ${managerEmail}
-
-DINE ANSVARSOMRÅDER:
-${responsibilities['AMR'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
-
-ÅBEN ONBOARDING-SYSTEM:
-${ONBOARDING_URL}?sag=${encodeURIComponent(caseNumber)}
-
-Kontakt teamleder hvis du har spørgsmål.
-
-Med venlig hilsen
-Katrinehaven`;
-
-            allEmails.push({ 
-                email: amrEmail, 
-                name: amrName + ' (AMR)', 
-                body: amrBody, 
-                tasks: responsibilities['AMR'] 
-            });
-
-            // Medicinansvarlig email
-            let medicineBody = `NY MEDARBEJDER STARTER - KATRINEHAVEN
-Sagsnummer: ${caseNumber}
-
-Kære ${medicineResponsible},
-
-En ny medarbejder starter hos Katrinehaven, og du har fået tildelt ansvaret for medicinintro.
-
-MEDARBEJDERINFORMATION:
-Navn: ${employeeName}
-Klynge/Afdeling: ${employeeCluster}
-Startdato: ${startDate}
-Teamleder: ${managerEmail}
-
-DINE ANSVARSOMRÅDER:
-${responsibilities['Medicinansvarlig'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
-
-ÅBEN ONBOARDING-SYSTEM:
-${ONBOARDING_URL}?sag=${encodeURIComponent(caseNumber)}
-
-Kontakt teamleder hvis du har spørgsmål.
-
-Med venlig hilsen
-Katrinehaven`;
-
-            allEmails.push({ 
-                email: medicineResponsibleEmail, 
-                name: medicineResponsible + ' (Medicinansvarlig)', 
-                body: medicineBody, 
-                tasks: responsibilities['Medicinansvarlig'] 
-            });
-
-            // Vis modal med email-liste
-            const emailList = document.getElementById('emailList');
-            emailList.innerHTML = '';
-            const subject = `Ny medarbejder starter: ${employeeName} - ${caseNumber}`;
-
-            allEmails.forEach((recipient, index) => {
-                const recipientDiv = document.createElement('div');
-                recipientDiv.className = 'email-recipient';
-                
-                const tasksList = recipient.tasks.length > 0 
-                    ? `<ul class="email-tasks">${recipient.tasks.slice(0, 3).map(t => `<li>${t}</li>`).join('')}${recipient.tasks.length > 3 ? `<li>... og ${recipient.tasks.length - 3} flere</li>` : ''}</ul>`
-                    : '<p style="font-size: 12px; color: #94a3b8; margin-top: 5px;">Ingen specifikke opgaver</p>';
-                
-                recipientDiv.innerHTML = `
-                    <div class="email-recipient-header">
-                        <div>
-                            <div class="email-recipient-name">${recipient.name}</div>
-                            <div class="email-recipient-email">${recipient.email}</div>
-                        </div>
-                        <button class="email-send-btn" data-index="${index}">📧 Send email</button>
-                    </div>
-                    ${tasksList}
-                `;
-                
-                emailList.appendChild(recipientDiv);
-            });
-
-            // Event listeners til send-knapper
-            document.querySelectorAll('.email-send-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    const recipient = allEmails[index];
-                    const mailtoLink = `mailto:${recipient.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(recipient.body)}`;
-                    window.open(mailtoLink, '_blank');
-                    
-                    this.textContent = '✓ Sendt';
-                    this.classList.add('sent');
-                    this.disabled = true;
-                });
-            });
-
-            document.getElementById('emailModal').classList.add('show');
+            alert('Email-funktion kommer i næste opdatering!');
         });
 
         // Start
