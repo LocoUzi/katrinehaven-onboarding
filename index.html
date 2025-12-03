@@ -16,19 +16,6 @@
             box-sizing: border-box;
         }
 
-        /* helper class for screen-reader-only labels */
-        .visually-hidden {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #4a7c59 0%, #2d5a3d 100%);
@@ -76,7 +63,6 @@
             font-size: 14px;
             font-weight: 600;
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); /* Safari fallback */
         }
 
         .action-bar {
@@ -682,22 +668,6 @@
             margin-left: auto;
         }
 
-        /* layout for welcome-email button wrapper */
-        .send-welcome-wrapper {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .send-welcome-btn {
-            padding: 12px 30px;
-            font-size: 15px;
-        }
-
-        .submit-note {
-            margin-top: 10px;
-            color: #64748b;
-            font-size: 13px;
-        }
-
         @media print {
             body {
                 background: white;
@@ -737,8 +707,7 @@
             <button class="action-btn primary" id="newCaseBtn">+ Ny Onboarding</button>
             <button class="action-btn secondary" id="loadCaseBtn">📂 Indlæs Onboarding</button>
             <button class="action-btn success" id="saveBtn">💾 Gem</button>
-            <label for="caseSelector" class="visually-hidden">Vælg onboarding</label>
-            <select class="case-selector" id="caseSelector" aria-label="Vælg onboarding">
+            <select class="case-selector" id="caseSelector">
                 <option value="">Vælg en onboarding...</option>
             </select>
             <span class="auto-save-indicator" id="autoSaveIndicator"></span>
@@ -811,8 +780,8 @@
                     <input type="email" id="medicineResponsibleEmail" placeholder="email@viborg.dk" required>
                 </div>
             </div>
-            <div class="send-welcome-wrapper">
-                <button class="action-btn success send-welcome-btn" id="sendWelcomeBtn" disabled>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="action-btn success" id="sendWelcomeBtn" disabled style="padding: 12px 30px; font-size: 15px;">
                     📧 Send velkomst-email til alle ansvarlige
                 </button>
             </div>
@@ -831,7 +800,7 @@
             <button class="submit-btn" id="submitBtn" disabled>
                 Send til leder
             </button>
-            <p class="submit-note">
+            <p style="margin-top: 10px; color: #64748b; font-size: 13px;">
                 Knappen aktiveres når alle oplysninger er udfyldt og alle opgaver er afkrydsede
             </p>
         </div>
@@ -1262,8 +1231,6 @@
             document.getElementById('sendWelcomeBtn').disabled = !allFieldsFilled;
         }
 
-        let taskCounter = 0;
-
         function renderTasks() {
             const tasksContent = document.getElementById('tasksContent');
             tasksContent.innerHTML = '';
@@ -1281,35 +1248,32 @@
                     const taskDiv = document.createElement('div');
                     taskDiv.className = 'task-item';
 
-                    const uniqueId = 'task-' + (taskCounter++);
-
                     let metaBadges = `<span class="meta-badge responsible">👤 ${task.responsible}</span>`;
                     if (task.time) metaBadges += `<span class="meta-badge time">⏱️ ${task.time}</span>`;
                     if (task.date) metaBadges += `<span class="meta-badge date">📅 ${task.date}</span>`;
 
                     taskDiv.innerHTML = `
-                        <button class="delete-task-btn" aria-label="Fjern opgave">✕ Fjern</button>
+                        <button class="delete-task-btn">✕ Fjern</button>
                         <div class="task-header">
-                            <input type="checkbox" class="task-checkbox" id="check-${uniqueId}">
-                            <label for="check-${uniqueId}" class="visually-hidden">Marker opgave som fuldført</label>
+                            <input type="checkbox" class="task-checkbox">
                             <div class="task-content">
                                 <div class="task-title">${task.title}</div>
                                 <div class="task-details">${task.details}</div>
                                 <div class="task-meta">${metaBadges}</div>
                                 <div class="date-input-wrapper">
-                                    <label for="date-${uniqueId}">Gennemført dato:</label>
-                                    <input type="date" class="task-date" id="date-${uniqueId}" aria-label="Gennemført dato">
+                                    <label>Gennemført dato:</label>
+                                    <input type="date" class="task-date">
                                 </div>
                                 <div class="signature-section">
                                     <h4>✍️ Underskrifter</h4>
                                     <div class="signature-grid">
                                         <div class="signature-field">
-                                            <label for="emp-${uniqueId}">Medarbejderens initialer:</label>
-                                            <input type="text" class="employee-signature" id="emp-${uniqueId}" placeholder="Fx ABC" maxlength="5" aria-label="Medarbejderens initialer">
+                                            <label>Medarbejderens initialer:</label>
+                                            <input type="text" class="employee-signature" placeholder="Fx ABC" maxlength="5">
                                         </div>
                                         <div class="signature-field">
-                                            <label for="resp-${uniqueId}">Ansvarlig (${task.responsible}) initialer:</label>
-                                            <input type="text" class="responsible-signature" id="resp-${uniqueId}" placeholder="Fx XYZ" maxlength="5" aria-label="Ansvarlig initialer">
+                                            <label>Ansvarlig (${task.responsible}) initialer:</label>
+                                            <input type="text" class="responsible-signature" placeholder="Fx XYZ" maxlength="5">
                                         </div>
                                     </div>
                                 </div>
