@@ -34,7 +34,7 @@
 
         .header {
             background: linear-gradient(rgba(45, 90, 61, 0.85), rgba(45, 90, 61, 0.85)),
-                        url('https://i.imgur.com/placeholder.jpg') center/cover;
+                        url('https://github.com/LocoUzi/katrinehaven-onboarding/blob/main/katrinehaven.jpg?raw=true') center/cover;
             color: white;
             padding: 60px 30px;
             text-align: center;
@@ -707,7 +707,6 @@
             <button class="action-btn primary" id="newCaseBtn">+ Ny Onboarding</button>
             <button class="action-btn secondary" id="loadCaseBtn">📂 Indlæs Onboarding</button>
             <button class="action-btn success" id="saveBtn">💾 Gem</button>
-            <button class="action-btn" id="deleteCaseBtn" title="Slet denne onboarding">🗑️ Slet</button>
             <select class="case-selector" id="caseSelector">
                 <option value="">Vælg en onboarding...</option>
             </select>
@@ -979,32 +978,6 @@
         function saveCurrentCase() {
             if (!currentCaseId) return;
 
-            // Prevent saving completely empty cases created by auto-save.
-            // If no identifying fields are filled and no tasks checked, skip saving.
-            const possibleFields = [
-                document.getElementById('employeeName').value,
-                document.getElementById('employeeCluster').value,
-                document.getElementById('startDate').value,
-                document.getElementById('managerEmail').value,
-                document.getElementById('workPlanner').value,
-                document.getElementById('workPlannerEmail').value,
-                document.getElementById('mentorName').value,
-                document.getElementById('mentorEmail').value,
-                document.getElementById('movementAdvisor').value,
-                document.getElementById('movementAdvisorEmail').value,
-                document.getElementById('amrName').value,
-                document.getElementById('amrEmail').value,
-                document.getElementById('medicineResponsible').value,
-                document.getElementById('medicineResponsibleEmail').value
-            ];
-            const anyFieldFilled = possibleFields.some(v => v && v.trim().length > 0);
-            const anyTaskChecked = !!document.querySelector('.task-checkbox:checked');
-            if (!anyFieldFilled && !anyTaskChecked) {
-                // nothing meaningful to save
-                return;
-            }
-
-
             const caseData = {
                 caseId: currentCaseId,
                 caseNumber: document.getElementById('caseNumber').textContent.replace('Sag: ', ''),
@@ -1144,30 +1117,7 @@
             saveCurrentCase();
         }
 
-
-        // Delete the currently loaded case (if any) from Firestore
-        function deleteCurrentCase() {
-            if (!currentCaseId) {
-                alert('Ingen onboarding valgt at slette.');
-                return;
-            }
-            if (!confirm('Er du sikker på, at du vil slette denne onboarding? Dette kan ikke fortrydes.')) return;
-            db.collection('onboardings').doc(currentCaseId).delete()
-                .then(() => {
-                    // If deleted, remove selection and create a fresh case
-                    alert('Onboarding slettet.');
-                    currentCaseId = null;
-                    updateCaseSelector();
-                    createNewCase();
-                })
-                .catch((err) => {
-                    console.error('Sletningsfejl:', err);
-                    alert('Kunne ikke slette onboarding. Se konsollen for fejl.');
-                });
-        }
-
-
-            function updateCaseSelector() {
+        function updateCaseSelector() {
             const selector = document.getElementById('caseSelector');
             selector.innerHTML = '<option value="">Vælg en onboarding...</option>';
 
@@ -1420,9 +1370,6 @@ ${taskList}`;
             saveCurrentCase();
             alert('Gemt!');
         });
-        document.getElementById('deleteCaseBtn').addEventListener('click', () => {
-            deleteCurrentCase();
-        });
         document.getElementById('closeCasesModal').addEventListener('click', () => {
             document.getElementById('loadCaseModal').classList.remove('show');
         });
@@ -1432,7 +1379,288 @@ ${taskList}`;
 
         // Send velkomst-emails
         document.getElementById('sendWelcomeBtn').addEventListener('click', () => {
-            alert('Email-funktion kommer i næste opdatering!');
+            const employeeName = document.getElementById('employeeName').value;
+            const employeeCluster = document.getElementById('employeeCluster').value;
+            const startDate = document.getElementById('startDate').value;
+            const caseNumber = document.getElementById('caseNumber').textContent.replace('Sag: ', '');
+            
+            const managerEmail = document.getElementById('managerEmail').value;
+            const workPlanner = document.getElementById('workPlanner').value;
+            const workPlannerEmail = document.getElementById('workPlannerEmail').value;
+            const mentorName = document.getElementById('mentorName').value;
+            const mentorEmail = document.getElementById('mentorEmail').value;
+            const movementAdvisor = document.getElementById('movementAdvisor').value;
+            const movementAdvisorEmail = document.getElementById('movementAdvisorEmail').value;
+            const amrName = document.getElementById('amrName').value;
+            const amrEmail = document.getElementById('amrEmail').value;
+            const medicineResponsible = document.getElementById('medicineResponsible').value;
+            const medicineResponsibleEmail = document.getElementById('medicineResponsibleEmail').value;
+
+            // Find opgaver for hver ansvarlig
+            const responsibilities = {
+                'Leder': [],
+                'Arbejdstidsplanlægger': [],
+                'Mentor': [],
+                'Forflytningsvejleder': [],
+                'Medicinansvarlig': [],
+                'AMR': [],
+                'Katrinehaven': [],
+                'Eksternt': []
+            };
+
+            tasksData.forEach(section => {
+                section.tasks.forEach(task => {
+                    if (responsibilities[task.responsible]) {
+                        responsibilities[task.responsible].push(task.title);
+                    }
+                });
+            });
+
+            // Generer emails
+            const allEmails = [];
+
+            // Teamleder email
+            let managerBody = `NY MEDARBEJDER STARTER - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+═══════════════════════════════════════
+MEDARBEJDERINFORMATION
+═══════════════════════════════════════
+Navn: ${employeeName}
+Klynge/Afdeling: ${employeeCluster}
+Startdato: ${startDate}
+
+═══════════════════════════════════════
+ANSVARLIGE FOR ONBOARDING
+═══════════════════════════════════════
+Arbejdstidsplanlægger: ${workPlanner} (${workPlannerEmail})
+Mentor: ${mentorName} (${mentorEmail})
+Forflytningsvejleder: ${movementAdvisor} (${movementAdvisorEmail})
+AMR: ${amrName} (${amrEmail})
+Medicinansvarlig: ${medicineResponsible} (${medicineResponsibleEmail})
+
+═══════════════════════════════════════
+DINE ANSVARSOMRÅDER SOM TEAMLEDER
+═══════════════════════════════════════
+${responsibilities['Leder'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
+
+═══════════════════════════════════════
+ÅBEN ONBOARDING-SYSTEM
+═══════════════════════════════════════
+${ONBOARDING_URL}?sag=${encodeURIComponent(caseNumber)}
+
+═══════════════════════════════════════
+Dette er en automatisk besked fra Katrinehavens onboarding-system.`;
+
+            allEmails.push({ 
+                email: managerEmail, 
+                name: 'Teamleder', 
+                body: managerBody, 
+                tasks: responsibilities['Leder'] 
+            });
+
+            // Arbejdstidsplanlægger email
+            let plannerBody = `NY MEDARBEJDER STARTER - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+Kære ${workPlanner},
+
+En ny medarbejder starter hos Katrinehaven, og du har fået tildelt ansvaret for dele af introforløbet.
+
+MEDARBEJDERINFORMATION:
+Navn: ${employeeName}
+Klynge/Afdeling: ${employeeCluster}
+Startdato: ${startDate}
+Teamleder: ${managerEmail}
+
+DINE ANSVARSOMRÅDER:
+${responsibilities['Arbejdstidsplanlægger'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
+
+ÅBEN ONBOARDING-SYSTEM:
+${ONBOARDING_URL}?sag=${encodeURIComponent(caseNumber)}
+
+Kontakt teamleder hvis du har spørgsmål.
+
+Med venlig hilsen
+Katrinehaven`;
+
+            allEmails.push({ 
+                email: workPlannerEmail, 
+                name: workPlanner + ' (Arbejdstidsplanlægger)', 
+                body: plannerBody, 
+                tasks: responsibilities['Arbejdstidsplanlægger'] 
+            });
+
+            // Mentor email
+            let mentorBody = `NY MEDARBEJDER STARTER - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+Kære ${mentorName},
+
+En ny medarbejder starter hos Katrinehaven, og du er blevet udpeget som mentor.
+
+MEDARBEJDERINFORMATION:
+Navn: ${employeeName}
+Klynge/Afdeling: ${employeeCluster}
+Startdato: ${startDate}
+Teamleder: ${managerEmail}
+
+DINE ANSVARSOMRÅDER SOM MENTOR:
+${responsibilities['Mentor'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
+
+ÅBEN ONBOARDING-SYSTEM:
+${ONBOARDING_URL}?sag=${encodeURIComponent(caseNumber)}
+
+Kontakt teamleder hvis du har spørgsmål.
+
+Med venlig hilsen
+Katrinehaven`;
+
+            allEmails.push({ 
+                email: mentorEmail, 
+                name: mentorName + ' (Mentor)', 
+                body: mentorBody, 
+                tasks: responsibilities['Mentor'] 
+            });
+
+            // Forflytningsvejleder email
+            let movementBody = `NY MEDARBEJDER STARTER - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+Kære ${movementAdvisor},
+
+En ny medarbejder starter hos Katrinehaven, og du har fået tildelt ansvaret for forflytningsintro.
+
+MEDARBEJDERINFORMATION:
+Navn: ${employeeName}
+Klynge/Afdeling: ${employeeCluster}
+Startdato: ${startDate}
+Teamleder: ${managerEmail}
+
+DINE ANSVARSOMRÅDER:
+${responsibilities['Forflytningsvejleder'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
+
+ÅBEN ONBOARDING-SYSTEM:
+${ONBOARDING_URL}?sag=${encodeURIComponent(caseNumber)}
+
+Kontakt teamleder hvis du har spørgsmål.
+
+Med venlig hilsen
+Katrinehaven`;
+
+            allEmails.push({ 
+                email: movementAdvisorEmail, 
+                name: movementAdvisor + ' (Forflytningsvejleder)', 
+                body: movementBody, 
+                tasks: responsibilities['Forflytningsvejleder'] 
+            });
+
+            // AMR email
+            let amrBody = `NY MEDARBEJDER STARTER - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+Kære ${amrName},
+
+En ny medarbejder starter hos Katrinehaven, og du har fået tildelt ansvaret for AMR-intro.
+
+MEDARBEJDERINFORMATION:
+Navn: ${employeeName}
+Klynge/Afdeling: ${employeeCluster}
+Startdato: ${startDate}
+Teamleder: ${managerEmail}
+
+DINE ANSVARSOMRÅDER:
+${responsibilities['AMR'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
+
+ÅBEN ONBOARDING-SYSTEM:
+${ONBOARDING_URL}?sag=${encodeURIComponent(caseNumber)}
+
+Kontakt teamleder hvis du har spørgsmål.
+
+Med venlig hilsen
+Katrinehaven`;
+
+            allEmails.push({ 
+                email: amrEmail, 
+                name: amrName + ' (AMR)', 
+                body: amrBody, 
+                tasks: responsibilities['AMR'] 
+            });
+
+            // Medicinansvarlig email
+            let medicineBody = `NY MEDARBEJDER STARTER - KATRINEHAVEN
+Sagsnummer: ${caseNumber}
+
+Kære ${medicineResponsible},
+
+En ny medarbejder starter hos Katrinehaven, og du har fået tildelt ansvaret for medicinintro.
+
+MEDARBEJDERINFORMATION:
+Navn: ${employeeName}
+Klynge/Afdeling: ${employeeCluster}
+Startdato: ${startDate}
+Teamleder: ${managerEmail}
+
+DINE ANSVARSOMRÅDER:
+${responsibilities['Medicinansvarlig'].map((task, i) => `${i + 1}. ${task}`).join('\n')}
+
+ÅBEN ONBOARDING-SYSTEM:
+${ONBOARDING_URL}?sag=${encodeURIComponent(caseNumber)}
+
+Kontakt teamleder hvis du har spørgsmål.
+
+Med venlig hilsen
+Katrinehaven`;
+
+            allEmails.push({ 
+                email: medicineResponsibleEmail, 
+                name: medicineResponsible + ' (Medicinansvarlig)', 
+                body: medicineBody, 
+                tasks: responsibilities['Medicinansvarlig'] 
+            });
+
+            // Vis modal med email-liste
+            const emailList = document.getElementById('emailList');
+            emailList.innerHTML = '';
+            const subject = `Ny medarbejder starter: ${employeeName} - ${caseNumber}`;
+
+            allEmails.forEach((recipient, index) => {
+                const recipientDiv = document.createElement('div');
+                recipientDiv.className = 'email-recipient';
+                
+                const tasksList = recipient.tasks.length > 0 
+                    ? `<ul class="email-tasks">${recipient.tasks.slice(0, 3).map(t => `<li>${t}</li>`).join('')}${recipient.tasks.length > 3 ? `<li>... og ${recipient.tasks.length - 3} flere</li>` : ''}</ul>`
+                    : '<p style="font-size: 12px; color: #94a3b8; margin-top: 5px;">Ingen specifikke opgaver</p>';
+                
+                recipientDiv.innerHTML = `
+                    <div class="email-recipient-header">
+                        <div>
+                            <div class="email-recipient-name">${recipient.name}</div>
+                            <div class="email-recipient-email">${recipient.email}</div>
+                        </div>
+                        <button class="email-send-btn" data-index="${index}">📧 Send email</button>
+                    </div>
+                    ${tasksList}
+                `;
+                
+                emailList.appendChild(recipientDiv);
+            });
+
+            // Event listeners til send-knapper
+            document.querySelectorAll('.email-send-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    const recipient = allEmails[index];
+                    const mailtoLink = `mailto:${recipient.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(recipient.body)}`;
+                    window.open(mailtoLink, '_blank');
+                    
+                    this.textContent = '✓ Sendt';
+                    this.classList.add('sent');
+                    this.disabled = true;
+                });
+            });
+
+            document.getElementById('emailModal').classList.add('show');
         });
 
         // Start
