@@ -976,7 +976,15 @@
         }
 
         function saveCurrentCase() {
-            if (!currentCaseId) return;
+    if (!currentCaseId) return;
+    
+    // Gem kun hvis der er indtastet noget
+    const employeeName = document.getElementById('employeeName').value;
+    const employeeCluster = document.getElementById('employeeCluster').value;
+    
+    if (!employeeName && !employeeCluster) {
+        return;
+    }
 
             const caseData = {
                 caseId: currentCaseId,
