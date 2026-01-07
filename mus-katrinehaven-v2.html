@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUS System - Katrinehaven</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="email"],
+        input[type="text"],
+        input[type="password"],
+        input[type="date"],
+        input[type="time"],
+        input[type="datetime-local"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-small {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        .code-display {
+            background: #f0f3ff;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .code-display .code {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 5px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-info {
+            background: #f0f3ff;
+            color: #004085;
+            border: 1px solid #667eea;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .question-section {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .question-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #764ba2;
+        }
+
+        .question {
+            margin-bottom: 25px;
+        }
+
+        .question-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: auto;
+        }
+
+        .employee-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .employee-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .employee-card h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .employee-card .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .time-slot-card {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .time-slot-card.booked {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .time-slot-info {
+            flex: 1;
+        }
+
+        .time-slot-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .navigation-buttons button {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .radio-group {
+                flex-direction: column;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ MUS System</h1>
+            <p>Katrinehaven - Medarbejderudviklingssamtaler</p>
+        </div>
+
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen active">
+            <div class="form-group">
+                <label for="loginType">Vælg logintype:</label>
+                <select id="loginType" onchange="toggleLoginType()">
+                    <option value="employee">Medarbejder</option>
+                    <option value="leader">Leder</option>
+                </select>
+            </div>
+
+            <div id="employeeLogin">
+                <div class="form-group">
+                    <label for="employeeEmail">Din arbejds-email:</label>
+                    <input type="email" id="employeeEmail" placeholder="din.email@viborg.dk">
+                </div>
+                <div class="form-group">
+                    <label for="employeeCluster">Vælg din klynge:</label>
+                    <select id="employeeCluster">
+                        <option value="">-- Vælg klynge --</option>
+                        <option value="1">Klynge 1</option>
+                        <option value="2">Klynge 2</option>
+                        <option value="3">Klynge 3</option>
+                        <option value="4">Klynge 4</option>
+                        <option value="5">Klynge 5</option>
+                        <option value="6">Klynge 6</option>
+                        <option value="7">Klynge 7</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="sendCode()">Send engangskode</button>
+            </div>
+
+            <div id="leaderLogin" style="display: none;">
+                <div class="form-group">
+                    <label for="leaderUsername">Brugernavn:</label>
+                    <input type="text" id="leaderUsername" placeholder="Carina / Anders / Lene">
+                </div>
+                <div class="form-group">
+                    <label for="leaderPassword">Adgangskode:</label>
+                    <input type="password" id="leaderPassword" placeholder="Indtast adgangskode">
+                </div>
+                <button class="btn" onclick="leaderLogin()">Log ind som leder</button>
+            </div>
+        </div>
+
+        <!-- Code Verification Screen -->
+        <div id="codeScreen" class="screen">
+            <div class="alert alert-info">
+                <strong>📧 Engangskode sendt!</strong><br>
+                Din engangskode er vist nedenfor. I fremtiden vil den blive sendt til din email.
+            </div>
+            
+            <div class="code-display">
+                <p>Din engangskode:</p>
+                <div class="code" id="displayedCode"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="codeInput">Indtast engangskode:</label>
+                <input type="text" id="codeInput" placeholder="Indtast 4-cifret kode" maxlength="4">
+            </div>
+
+            <button class="btn" onclick="verifyCode()">Verificer kode</button>
+            <button class="btn btn-secondary" onclick="goToLogin()">Tilbage</button>
+        </div>
+
+        <!-- Employee Dashboard -->
+        <div id="employeeDashboard" class="screen">
+            <div class="alert alert-success">
+                Velkommen, <span id="employeeName"></span>!
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="showEmployeeTab('booking')">📅 Book MUS</button>
+                <button class="tab" onclick="showEmployeeTab('questionnaire')">📝 Spørgeskema</button>
+            </div>
+
+            <!-- Booking Tab -->
+            <div id="bookingTab" class="tab-content">
+                <h3>Book din MUS-samtale</h3>
+                <p style="margin-bottom: 20px; color: #666;">
+                    Vælg din leder og en ledig tid nedenfor.
+                </p>
+
+                <div class="form-group">
+                    <label for="bookingLeader">Vælg din leder:</label>
+                    <select id="bookingLeader" onchange="loadAvailableTimes()">
+                        <option value="">-- Vælg leder --</option>
+                        <option value="Carina">Carina</option>
+                        <option value="Anders">Anders</option>
+                        <option value="Lene">Lene</option>
+                    </select>
+                </div>
+
+                <div id="availableTimesContainer" style="display: none;">
+                    <div class="form-group">
+                        <label for="bookingTimeSlot">Vælg ledig tid:</label>
+                        <select id="bookingTimeSlot">
+                            <option value="">-- Vælg tid --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="musNotes">Evt. bemærkninger:</label>
+                        <textarea id="musNotes" placeholder="F.eks. 'Jeg ser frem til samtalen'"></textarea>
+                    </div>
+
+                    <button class="btn" onclick="bookMUS()">Book MUS og send invitation</button>
+                </div>
+            </div>
+
+            <!-- Questionnaire Tab -->
+            <div id="questionnaireTab" class="tab-content" style="display: none;">
+                <div id="questionnaireForm"></div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="logout()" style="margin-top: 30px;">Log ud</button>
+        </div>
+
+        <!-- Leader Dashboard -->
+        <div id="leaderDashboard" class="screen">
+            <div class="alert alert-success">
+                Velkommen, <span id="leaderNameDisplay"></span>!
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="showLeaderTab('timeslots')">🕐 Ledige tider</button>
+                <button class="tab" onclick="showLeaderTab('employees')">👥 Medarbejdere</button>
+                <button class="tab" onclick="showLeaderTab('questions')">⚙️ Rediger spørgsmål</button>
+                <button class="tab" onclick="showLeaderTab('settings')">🔧 Indstillinger</button>
+            </div>
+
+            <!-- Time Slots Tab -->
+            <div id="timeslotsTab" class="tab-content">
+                <h3>Mine ledige tider</h3>
+                <p style="margin-bottom: 20px; color: #666;">
+                    Opret tider som dine medarbejdere kan booke.
+                </p>
+
+                <div class="question-section">
+                    <h3>Tilføj ny ledig tid</h3>
+                    <div class="form-group">
+                        <label for="newTimeSlot">Vælg dato og tidspunkt:</label>
+                        <input type="datetime-local" id="newTimeSlot">
+                    </div>
+                    <button class="btn btn-success" onclick="addTimeSlot()">Tilføj tid</button>
+                </div>
+
+                <h3 style="margin-top: 30px;">Dine tider:</h3>
+                <div id="timeSlotsList"></div>
+            </div>
+
+            <!-- Employees Tab -->
+            <div id="employeesTab" class="tab-content" style="display: none;">
+                <h3>Alle medarbejderes MUS</h3>
+                <div class="form-group" style="margin-bottom: 30px;">
+                    <label for="leaderClusterSelect">Vælg klynge at se:</label>
+                    <select id="leaderClusterSelect" onchange="changeLeaderCluster()">
+                        <option value="">-- Vælg klynge --</option>
+                        <option value="1">Klynge 1</option>
+                        <option value="2">Klynge 2</option>
+                        <option value="3">Klynge 3</option>
+                        <option value="4">Klynge 4</option>
+                        <option value="5">Klynge 5</option>
+                        <option value="6">Klynge 6</option>
+                        <option value="7">Klynge 7</option>
+                    </select>
+                </div>
+                <div id="employeesList"></div>
+            </div>
+
+            <!-- Questions Tab -->
+            <div id="questionsTab" class="tab-content" style="display: none;">
+                <h3>Rediger standard MUS-spørgsmål</h3>
+                <p style="margin-bottom: 20px; color: #666;">
+                    Disse spørgsmål er fælles for alle medarbejdere. Du kan redigere dem her.
+                </p>
+                <div id="questionsEditor"></div>
+                <button class="btn btn-success" onclick="saveQuestions()">Gem ændringer</button>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settingsTab" class="tab-content" style="display: none;">
+                <h3>Indstillinger</h3>
+                
+                <div class="question-section">
+                    <h3>Skift adgangskode</h3>
+                    <div class="form-group">
+                        <label for="currentPassword">Nuværende adgangskode:</label>
+                        <input type="password" id="currentPassword">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Ny adgangskode:</label>
+                        <input type="password" id="newPassword">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Bekræft ny adgangskode:</label>
+                        <input type="password" id="confirmPassword">
+                    </div>
+                    <button class="btn btn-success" onclick="changePassword()">Skift adgangskode</button>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="logout()" style="margin-top: 30px;">Log ud</button>
+        </div>
+
+        <!-- Employee Detail View -->
+        <div id="employeeDetailScreen" class="screen">
+            <button class="btn btn-secondary" onclick="backToLeaderDashboard()" style="margin-bottom: 20px;">← Tilbage til oversigt</button>
+            
+            <h2 id="detailEmployeeName"></h2>
+            <div id="detailBookingInfo" class="alert alert-info"></div>
+            
+            <div id="detailAnswers"></div>
+
+            <div class="navigation-buttons">
+                <button class="btn btn-success" onclick="exportToPDF()">📄 Gem som PDF-dokument</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // State management
+        let currentUser = null;
+        let currentCode = null;
+        let isLeader = false;
+        let currentLeader = null;
+        let currentEmployeeDetail = null;
+        let selectedLeaderCluster = null;
+
+        // Default leader passwords
+        const DEFAULT_LEADER_PASSWORDS = {
+            'Carina': 'Carina1',
+            'Anders': 'Anders1',
+            'Lene': 'Lene1'
+        };
+
+        // Leader emails
+        const LEADER_EMAILS = {
+            'Carina': 'caja@viborg.dk',
+            'Anders': 'amjak@viborg.dk',
+            'Lene': 'lsma@viborg.dk'
+        };
+
+        // Default MUS questions
+        const DEFAULT_QUESTIONS = [
+            {
+                section: "Opfølgning siden sidst",
+                questions: [
+                    {
+                        id: "q1",
+                        text: "Hvordan er det gået med opfølgning på aftaler om udvikling?",
+                        type: "textarea",
+                        answer: ""
+                    },
+                    {
+                        id: "q2",
+                        text: "Hvad er gået godt, og hvad kendetegner de situationer eller opgaver?",
+                        type: "textarea",
+                        answer: ""
+                    },
+                    {
+                        id: "q3",
+                        text: "Hvad ville jeg gerne være lykkedes bedre med? Og hvad skulle have været anderledes, for at nå i mål?",
+                        type: "textarea",
+                        answer: ""
+                    },
+                    {
+                        id: "q4",
+                        text: "Hvilke resultater er jeg mest glad for at have opnået?",
+                        type: "textarea",
+                        answer: ""
+                    }
+                ]
+            },
+            {
+                section: "Organisatoriske rammer og opgaver",
+                questions: [
+                    {
+                        id: "q5",
+                        text: "Jeg har kendskab til de rammer, målsætninger og prioriteringer som arbejdspladsen arbejder efter",
+                        type: "scale",
+                        answer: "",
+                        followup: ""
+                    },
+                    {
+                        id: "q6",
+                        text: "Min nærmeste leder er god til at sætte klare mål for arbejdspladsen",
+                        type: "scale",
+                        answer: "",
+                        followup: ""
+                    },
+                    {
+                        id: "q7",
+                        text: "Jeg formår at bidrage aktivt og konstruktivt til arbejdspladsens udvikling og opgaveløsning",
+                        type: "scale",
+                        answer: "",
+                        followup: ""
+                    },
+                    {
+                        id: "q8",
+                        text: "Jeg har en forståelse for min rolle på arbejdspladsen og ved hvilke kompetencer jeg kan byde ind med",
+                        type: "scale",
+                        answer: "",
+                        followup: ""
+                    }
+                ]
+            },
+            {
+                section: "Relationer og samarbejde",
+                questions: [
+                    {
+                        id: "q9",
+                        text: "Jeg bidrager aktivt til et godt samarbejde med kolleger, samarbejdspartnere og ledere",
+                        type: "scale",
+                        answer: "",
+                        followup: ""
+                    },
+                    {
+                        id: "q10",
+                        text: "Jeg tager ansvar for fælles resultatskabelse og fælles arbejdsglæde og trivsel",
+                        type: "scale",
+                        answer: "",
+                        followup: ""
+                    },
+                    {
+                        id: "q11",
+                        text: "Jeg kan få støtte og vejledning, når jeg har behov for det",
+                        type: "scale",
+                        answer: "",
+                        followup: ""
+                    },
+                    {
+                        id: "q12",
+                        text: "Jeg får tilbagemeldinger om kvalitet af det arbejde, jeg udfører",
+                        type: "scale",
+                        answer: "",
+                        followup: ""
+                    }
+                ]
+            },
+            {
+                section: "Kompetencer og udvikling",
+                questions: [
+                    {
+                        id: "q13",
+                        text: "Hvor ser jeg mit behov for udvikling i kompetencer og opgaver ift. arbejdspladsens opgaveløsning?",
+                        type: "textarea",
+                        answer: ""
+                    },
+                    {
+                        id: "q14",
+                        text: "Jeg har mulighed for at lære nyt og udvikle mig gennem mit arbejde",
+                        type: "scale",
+                        answer: "",
+                        followup: ""
+                    }
+                ]
+            },
+            {
+                section: "Tilknytning til arbejdspladsen",
+                questions: [
+                    {
+                        id: "q15",
+                        text: "Når vi har MUS-samtale igen til næste år (eller om 5 år), hvad har så været medvirkende til at vi har kunne fastholde dig?",
+                        type: "textarea",
+                        answer: ""
+                    },
+                    {
+                        id: "q16",
+                        text: "Er der særlige forhold, vi som arbejdsplads skal tage hensyn til/bør kende for at sikre din fortsatte tilknytning?",
+                        type: "textarea",
+                        answer: ""
+                    },
+                    {
+                        id: "q17",
+                        text: "Er der behov for at kigge på arbejds- og opgavetilrettelæggelse/ressourcer i forhold til tilknytning på kort og langt sigt?",
+                        type: "textarea",
+                        answer: ""
+                    }
+                ]
+            },
+            {
+                section: "Konkrete aftaler om udvikling",
+                questions: [
+                    {
+                        id: "q18",
+                        text: "Hvilke 1-2 udviklingsmål er relevante for det kommende år? Hvilke indsatser kræver de?",
+                        type: "textarea",
+                        answer: ""
+                    }
+                ]
+            }
+        ];
+
+        // Initialize localStorage
+        function initStorage() {
+            if (!localStorage.getItem('musDataKatrinehaven')) {
+                localStorage.setItem('musDataKatrinehaven', JSON.stringify({}));
+            }
+            if (!localStorage.getItem('musQuestionsKatrinehaven')) {
+                localStorage.setItem('musQuestionsKatrinehaven', JSON.stringify(DEFAULT_QUESTIONS));
+            }
+            if (!localStorage.getItem('leaderPasswordsKatrinehaven')) {
+                localStorage.setItem('leaderPasswordsKatrinehaven', JSON.stringify(DEFAULT_LEADER_PASSWORDS));
+            }
+            if (!localStorage.getItem('timeSlotsKatrinehaven')) {
+                localStorage.setItem('timeSlotsKatrinehaven', JSON.stringify({
+                    'Carina': [],
+                    'Anders': [],
+                    'Lene': []
+                }));
+            }
+        }
+
+        // Get all MUS data
+        function getAllMUSData() {
+            return JSON.parse(localStorage.getItem('musDataKatrinehaven') || '{}');
+        }
+
+        // Save MUS data
+        function saveMUSData(email, data) {
+            const allData = getAllMUSData();
+            allData[email] = data;
+            localStorage.setItem('musDataKatrinehaven', JSON.stringify(allData));
+        }
+
+        // Get questions
+        function getQuestions() {
+            return JSON.parse(localStorage.getItem('musQuestionsKatrinehaven') || JSON.stringify(DEFAULT_QUESTIONS));
+        }
+
+        // Save questions
+        function saveQuestionsToStorage(questions) {
+            localStorage.setItem('musQuestionsKatrinehaven', JSON.stringify(questions));
+        }
+
+        // Get leader passwords
+        function getLeaderPasswords() {
+            return JSON.parse(localStorage.getItem('leaderPasswordsKatrinehaven') || JSON.stringify(DEFAULT_LEADER_PASSWORDS));
+        }
+
+        // Save leader passwords
+        function saveLeaderPasswords(passwords) {
+            localStorage.setItem('leaderPasswordsKatrinehaven', JSON.stringify(passwords));
+        }
+
+        // Get time slots
+        function getTimeSlots() {
+            return JSON.parse(localStorage.getItem('timeSlotsKatrinehaven') || JSON.stringify({
+                'Carina': [],
+                'Anders': [],
+                'Lene': []
+            }));
+        }
+
+        // Save time slots
+        function saveTimeSlots(slots) {
+            localStorage.setItem('timeSlotsKatrinehaven', JSON.stringify(slots));
+        }
+
+        // Login functions
+        function toggleLoginType() {
+            const type = document.getElementById('loginType').value;
+            document.getElementById('employeeLogin').style.display = type === 'employee' ? 'block' : 'none';
+            document.getElementById('leaderLogin').style.display = type === 'leader' ? 'block' : 'none';
+        }
+
+        function sendCode() {
+            const email = document.getElementById('employeeEmail').value.trim();
+            const cluster = document.getElementById('employeeCluster').value;
+            
+            if (!email || !email.includes('@')) {
+                alert('Indtast venligst en gyldig email-adresse');
+                return;
+            }
+
+            if (!cluster) {
+                alert('Vælg venligst din klynge');
+                return;
+            }
+
+            // Check if user already exists and has a permanent code
+            const allData = getAllMUSData();
+            let permanentCode;
+            
+            if (allData[email] && allData[email].permanentCode) {
+                permanentCode = allData[email].permanentCode;
+            } else {
+                permanentCode = Math.floor(1000 + Math.random() * 9000).toString();
+                
+                if (!allData[email]) {
+                    allData[email] = {
+                        name: email.split('@')[0],
+                        email: email,
+                        cluster: cluster,
+                        permanentCode: permanentCode,
+                        booking: null,
+                        answers: getQuestions()
+                    };
+                } else {
+                    allData[email].permanentCode = permanentCode;
+                }
+                saveMUSData(email, allData[email]);
+            }
+
+            currentCode = permanentCode;
+            currentUser = { 
+                email: email, 
+                name: email.split('@')[0],
+                cluster: cluster
+            };
+
+            const isFirstTime = !allData[email] || !allData[email].permanentCode;
+            document.getElementById('displayedCode').textContent = currentCode;
+            
+            const codeMessage = document.querySelector('#codeScreen .alert');
+            if (isFirstTime) {
+                codeMessage.innerHTML = `
+                    <strong>📧 Din personlige engangskode!</strong><br>
+                    Dette er din <strong>faste kode</strong>. Gem den godt - du skal bruge den samme kode hver gang du logger ind.
+                `;
+            } else {
+                codeMessage.innerHTML = `
+                    <strong>📧 Velkommen tilbage!</strong><br>
+                    Indtast din faste kode nedenfor. (Det er den samme kode som sidst)
+                `;
+            }
+            
+            showScreen('codeScreen');
+        }
+
+        function verifyCode() {
+            const inputCode = document.getElementById('codeInput').value;
+
+            if (inputCode === currentCode) {
+                isLeader = false;
+                
+                const allData = getAllMUSData();
+                if (!allData[currentUser.email]) {
+                    allData[currentUser.email] = {
+                        name: currentUser.name,
+                        email: currentUser.email,
+                        cluster: currentUser.cluster,
+                        permanentCode: currentCode,
+                        booking: null,
+                        answers: getQuestions()
+                    };
+                    saveMUSData(currentUser.email, allData[currentUser.email]);
+                } else {
+                    allData[currentUser.email].cluster = currentUser.cluster;
+                    if (!allData[currentUser.email].permanentCode) {
+                        allData[currentUser.email].permanentCode = currentCode;
+                    }
+                    saveMUSData(currentUser.email, allData[currentUser.email]);
+                }
+
+                showEmployeeDashboard();
+            } else {
+                alert('Forkert kode. Prøv igen.');
+            }
+        }
+
+        function leaderLogin() {
+            const username = document.getElementById('leaderUsername').value.trim();
+            const password = document.getElementById('leaderPassword').value;
+
+            const passwords = getLeaderPasswords();
+
+            if (passwords[username] && passwords[username] === password) {
+                isLeader = true;
+                currentLeader = username;
+                selectedLeaderCluster = null;
+                showLeaderDashboard();
+            } else {
+                alert('Forkert brugernavn eller adgangskode');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            currentCode = null;
+            isLeader = false;
+            currentLeader = null;
+            document.getElementById('employeeEmail').value = '';
+            document.getElementById('leaderUsername').value = '';
+            document.getElementById('leaderPassword').value = '';
+            document.getElementById('codeInput').value = '';
+            showScreen('loginScreen');
+        }
+
+        function goToLogin() {
+            document.getElementById('codeInput').value = '';
+            showScreen('loginScreen');
+        }
+
+        // Screen navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Employee Dashboard
+        function showEmployeeDashboard() {
+            document.getElementById('employeeName').textContent = currentUser.name;
+            renderQuestionnaire();
+            loadBookingInfo();
+            showScreen('employeeDashboard');
+        }
+
+        function showEmployeeTab(tab) {
+            document.querySelectorAll('#employeeDashboard .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.getElementById('bookingTab').style.display = tab === 'booking' ? 'block' : 'none';
+            document.getElementById('questionnaireTab').style.display = tab === 'questionnaire' ? 'block' : 'none';
+        }
+
+        function loadBookingInfo() {
+            const userData = getAllMUSData()[currentUser.email];
+            if (userData && userData.booking) {
+                // User has already booked
+                document.getElementById('bookingTab').innerHTML = `
+                    <h3>Din MUS-samtale er booket</h3>
+                    <div class="alert alert-success">
+                        <strong>✅ Booket!</strong><br>
+                        Leder: ${userData.booking.leader}<br>
+                        Dato og tid: ${new Date(userData.booking.datetime).toLocaleString('da-DK')}<br>
+                        ${userData.booking.notes ? 'Bemærkninger: ' + userData.booking.notes : ''}
+                    </div>
+                    <p style="color: #666;">Hvis du har brug for at ændre din booking, kontakt venligst din leder direkte.</p>
+                `;
+            }
+        }
+
+        function loadAvailableTimes() {
+            const leader = document.getElementById('bookingLeader').value;
+            
+            if (!leader) {
+                document.getElementById('availableTimesContainer').style.display = 'none';
+                return;
+            }
+
+            const timeSlots = getTimeSlots();
+            const leaderSlots = timeSlots[leader] || [];
+            const availableSlots = leaderSlots.filter(slot => !slot.bookedBy);
+
+            const select = document.getElementById('bookingTimeSlot');
+            select.innerHTML = '<option value="">-- Vælg tid --</option>';
+
+            if (availableSlots.length === 0) {
+                select.innerHTML = '<option value="">Ingen ledige tider tilgængelige</option>';
+                document.getElementById('availableTimesContainer').style.display = 'block';
+                return;
+            }
+
+            availableSlots.forEach(slot => {
+                const date = new Date(slot.datetime);
+                const option = document.createElement('option');
+                option.value = slot.id;
+                option.textContent = date.toLocaleString('da-DK', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                select.appendChild(option);
+            });
+
+            document.getElementById('availableTimesContainer').style.display = 'block';
+        }
+
+        function bookMUS() {
+            const leader = document.getElementById('bookingLeader').value;
+            const timeSlotId = document.getElementById('bookingTimeSlot').value;
+            const notes = document.getElementById('musNotes').value;
+
+            if (!leader || !timeSlotId) {
+                alert('Vælg venligst både leder og tid');
+                return;
+            }
+
+            // Get the time slot
+            const timeSlots = getTimeSlots();
+            const leaderSlots = timeSlots[leader];
+            const slot = leaderSlots.find(s => s.id === timeSlotId);
+
+            if (!slot || slot.bookedBy) {
+                alert('Denne tid er ikke længere tilgængelig');
+                loadAvailableTimes();
+                return;
+            }
+
+            // Mark slot as booked
+            slot.bookedBy = currentUser.email;
+            slot.bookedByName = currentUser.name;
+            saveTimeSlots(timeSlots);
+
+            // Save booking
+            const booking = {
+                leader: leader,
+                leaderEmail: LEADER_EMAILS[leader],
+                datetime: slot.datetime,
+                notes: notes,
+                bookedAt: new Date().toISOString()
+            };
+
+            const userData = getAllMUSData()[currentUser.email];
+            userData.booking = booking;
+            saveMUSData(currentUser.email, userData);
+
+            // Open Outlook
+            openOutlookWebMeeting(slot.datetime, leader, LEADER_EMAILS[leader], notes);
+
+            alert(`✅ MUS-booking gemt!\n\nLeder: ${leader}\nTid: ${new Date(slot.datetime).toLocaleString('da-DK')}\n\nOutlook åbner nu i en ny fane så du kan sende møde-invitationen.`);
+            
+            // Reload booking info
+            loadBookingInfo();
+            showEmployeeTab('booking');
+        }
+
+        function openOutlookWebMeeting(datetime, leaderName, leaderEmail, notes) {
+            const date = new Date(datetime);
+            const startISO = date.toISOString();
+            const endDate = new Date(date.getTime() + 60 * 60 * 1000);
+            const endISO = endDate.toISOString();
+            
+            const body = `MUS-samtale med ${currentUser.name}
+
+Klynge: ${currentUser.cluster}
+${notes ? 'Bemærkninger: ' + notes : ''}`;
+            
+            const outlookWebUrl = `https://outlook.office.com/calendar/0/deeplink/compose?subject=${encodeURIComponent('MUS-samtale: ' + currentUser.name)}&body=${encodeURIComponent(body)}&to=${encodeURIComponent(leaderEmail)}&location=${encodeURIComponent('Katrinehaven')}&startdt=${encodeURIComponent(startISO)}&enddt=${encodeURIComponent(endISO)}&path=/calendar/action/compose&rru=addevent`;
+            
+            window.open(outlookWebUrl, '_blank');
+        }
+
+        // Questionnaire rendering
+        function renderQuestionnaire() {
+            const userData = getAllMUSData()[currentUser.email];
+            const questions = userData.answers;
+            
+            let html = '<h3>Udfyld dit MUS-spørgeskema</h3>';
+            html += '<p style="margin-bottom: 30px; color: #666;">Udfyld spørgeskemaet som forberedelse til din MUS-samtale. Dine svar gemmes automatisk.</p>';
+
+            questions.forEach((section) => {
+                html += `<div class="question-section">`;
+                html += `<h3>${section.section}</h3>`;
+
+                section.questions.forEach((q, qIndex) => {
+                    html += `<div class="question">`;
+                    html += `<label class="question-label">${qIndex + 1}. ${q.text}</label>`;
+
+                    if (q.type === 'textarea') {
+                        html += `<textarea id="answer_${q.id}" onblur="saveAnswer('${q.id}')">${q.answer || ''}</textarea>`;
+                    } else if (q.type === 'scale') {
+                        const options = [
+                            'I meget høj grad',
+                            'I høj grad',
+                            'I nogen grad',
+                            'I mindre grad',
+                            'Slet ikke'
+                        ];
+                        
+                        html += `<div class="radio-group">`;
+                        options.forEach(opt => {
+                            const checked = q.answer === opt ? 'checked' : '';
+                            html += `
+                                <div class="radio-option">
+                                    <input type="radio" name="scale_${q.id}" value="${opt}" ${checked} onchange="saveAnswer('${q.id}')">
+                                    <label>${opt}</label>
+                                </div>
+                            `;
+                        });
+                        html += `</div>`;
+                        html += `<label style="margin-top: 15px;">Uddyb gerne:</label>`;
+                        html += `<textarea id="followup_${q.id}" onblur="saveFollowup('${q.id}')" style="min-height: 80px;">${q.followup || ''}</textarea>`;
+                    }
+
+                    html += `</div>`;
+                });
+
+                html += `</div>`;
+            });
+
+            document.getElementById('questionnaireForm').innerHTML = html;
+        }
+
+        function saveAnswer(questionId) {
+            const userData = getAllMUSData()[currentUser.email];
+            
+            for (let section of userData.answers) {
+                for (let q of section.questions) {
+                    if (q.id === questionId) {
+                        if (q.type === 'textarea') {
+                            q.answer = document.getElementById(`answer_${questionId}`).value;
+                        } else if (q.type === 'scale') {
+                            const selected = document.querySelector(`input[name="scale_${questionId}"]:checked`);
+                            q.answer = selected ? selected.value : '';
+                        }
+                        break;
+                    }
+                }
+            }
+
+            saveMUSData(currentUser.email, userData);
+        }
+
+        function saveFollowup(questionId) {
+            const userData = getAllMUSData()[currentUser.email];
+            
+            for (let section of userData.answers) {
+                for (let q of section.questions) {
+                    if (q.id === questionId) {
+                        q.followup = document.getElementById(`followup_${questionId}`).value;
+                        break;
+                    }
+                }
+            }
+
+            saveMUSData(currentUser.email, userData);
+        }
+
+        // Leader Dashboard
+        function showLeaderDashboard() {
+            document.getElementById('leaderNameDisplay').textContent = currentLeader;
+            document.getElementById('leaderClusterSelect').value = selectedLeaderCluster || '';
+            renderTimeSlots();
+            renderEmployeesList();
+            renderQuestionsEditor();
+            showScreen('leaderDashboard');
+        }
+
+        function showLeaderTab(tab) {
+            document.querySelectorAll('#leaderDashboard .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.getElementById('timeslotsTab').style.display = tab === 'timeslots' ? 'block' : 'none';
+            document.getElementById('employeesTab').style.display = tab === 'employees' ? 'block' : 'none';
+            document.getElementById('questionsTab').style.display = tab === 'questions' ? 'block' : 'none';
+            document.getElementById('settingsTab').style.display = tab === 'settings' ? 'block' : 'none';
+        }
+
+        // Time Slots Management
+        function addTimeSlot() {
+            const datetimeInput = document.getElementById('newTimeSlot').value;
+            
+            if (!datetimeInput) {
+                alert('Vælg venligst en dato og tidspunkt');
+                return;
+            }
+
+            const datetime = new Date(datetimeInput).toISOString();
+            const timeSlots = getTimeSlots();
+            
+            const newSlot = {
+                id: Date.now().toString(),
+                datetime: datetime,
+                bookedBy: null,
+                bookedByName: null
+            };
+
+            if (!timeSlots[currentLeader]) {
+                timeSlots[currentLeader] = [];
+            }
+
+            timeSlots[currentLeader].push(newSlot);
+            timeSlots[currentLeader].sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+            
+            saveTimeSlots(timeSlots);
+            document.getElementById('newTimeSlot').value = '';
+            renderTimeSlots();
+            
+            alert('✅ Tid tilføjet!');
+        }
+
+        function deleteTimeSlot(slotId) {
+            if (!confirm('Er du sikker på at du vil slette denne tid?')) {
+                return;
+            }
+
+            const timeSlots = getTimeSlots();
+            const leaderSlots = timeSlots[currentLeader];
+            const slot = leaderSlots.find(s => s.id === slotId);
+
+            if (slot && slot.bookedBy) {
+                if (!confirm('Denne tid er allerede booket af ' + slot.bookedByName + '. Vil du stadig slette den?')) {
+                    return;
+                }
+
+                // Remove booking from employee data
+                const allData = getAllMUSData();
+                if (allData[slot.bookedBy] && allData[slot.bookedBy].booking) {
+                    allData[slot.bookedBy].booking = null;
+                    saveMUSData(slot.bookedBy, allData[slot.bookedBy]);
+                }
+            }
+
+            timeSlots[currentLeader] = leaderSlots.filter(s => s.id !== slotId);
+            saveTimeSlots(timeSlots);
+            renderTimeSlots();
+            
+            alert('✅ Tid slettet!');
+        }
+
+        function renderTimeSlots() {
+            const timeSlots = getTimeSlots();
+            const leaderSlots = timeSlots[currentLeader] || [];
+
+            let html = '';
+
+            if (leaderSlots.length === 0) {
+                html = '<p style="color: #666; padding: 20px; text-align: center;">Ingen tider oprettet endnu. Tilføj en tid ovenfor.</p>';
+            } else {
+                leaderSlots.forEach(slot => {
+                    const date = new Date(slot.datetime);
+                    const isBooked = !!slot.bookedBy;
+                    
+                    html += `
+                        <div class="time-slot-card ${isBooked ? 'booked' : ''}">
+                            <div class="time-slot-info">
+                                <strong>${date.toLocaleString('da-DK', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}</strong>
+                                ${isBooked ? `<br><span style="color: #155724;">✅ Booket af: ${slot.bookedByName}</span>` : '<br><span style="color: #856404;">⏳ Ledig</span>'}
+                            </div>
+                            <div class="time-slot-actions">
+                                <button class="btn btn-danger btn-small" onclick="deleteTimeSlot('${slot.id}')">Slet</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('timeSlotsList').innerHTML = html;
+        }
+
+        // Employee Management
+        function changeLeaderCluster() {
+            selectedLeaderCluster = document.getElementById('leaderClusterSelect').value;
+            renderEmployeesList();
+        }
+
+        function renderEmployeesList() {
+            const allData = getAllMUSData();
+            const emails = Object.keys(allData);
+
+            let html = '';
+
+            if (!selectedLeaderCluster) {
+                html = '<p style="color: #666; text-align: center; padding: 40px;">👆 Vælg venligst en klynge ovenfor for at se medarbejdere</p>';
+            } else {
+                // Filter by cluster and by leader
+                const filteredEmails = emails.filter(email => {
+                    const data = allData[email];
+                    return data.cluster === selectedLeaderCluster && 
+                           data.booking && 
+                           data.booking.leader === currentLeader;
+                });
+
+                if (filteredEmails.length === 0) {
+                    html = `<p style="color: #666; text-align: center; padding: 40px;">Ingen medarbejdere i Klynge ${selectedLeaderCluster} har booket MUS med dig endnu.</p>`;
+                } else {
+                    filteredEmails.forEach(email => {
+                        const data = allData[email];
+                        const hasAnswers = data.answers.some(s => s.questions.some(q => q.answer));
+
+                        html += `
+                            <div class="employee-card" onclick="showEmployeeDetail('${email}')">
+                                <h4>${data.name}</h4>
+                                <p style="color: #666; margin-bottom: 10px;">${email} • Klynge ${data.cluster}</p>
+                                <div>
+                                    <span class="status status-completed">📅 Booket: ${new Date(data.booking.datetime).toLocaleDateString('da-DK')}</span>
+                                    ${hasAnswers ?
+                                        `<span class="status status-completed" style="margin-left: 10px;">✅ Spørgeskema påbegyndt</span>` :
+                                        `<span class="status status-pending" style="margin-left: 10px;">⏳ Ikke udfyldt</span>`
+                                    }
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            document.getElementById('employeesList').innerHTML = html;
+        }
+
+        function showEmployeeDetail(email) {
+            currentEmployeeDetail = email;
+            const data = getAllMUSData()[email];
+
+            document.getElementById('detailEmployeeName').textContent = `${data.name} - Klynge ${data.cluster}`;
+
+            // Booking info
+            let bookingHtml = '';
+            if (data.booking) {
+                bookingHtml = `
+                    <strong>📅 MUS-booking:</strong><br>
+                    Dato og tid: ${new Date(data.booking.datetime).toLocaleString('da-DK')}<br>
+                    ${data.booking.notes ? `Bemærkninger: ${data.booking.notes}` : ''}
+                `;
+            }
+            document.getElementById('detailBookingInfo').innerHTML = bookingHtml;
+
+            // Answers with leader comments
+            let answersHtml = '<h3>Medarbejderens svar og dine kommentarer</h3>';
+            
+            data.answers.forEach((section) => {
+                answersHtml += `<div class="question-section">`;
+                answersHtml += `<h3>${section.section}</h3>`;
+
+                section.questions.forEach((q, qIndex) => {
+                    answersHtml += `<div class="question">`;
+                    answersHtml += `<label class="question-label">${qIndex + 1}. ${q.text}</label>`;
+
+                    if (q.type === 'textarea') {
+                        const answer = q.answer || '<em style="color: #999;">Ikke besvaret endnu</em>';
+                        answersHtml += `<div style="background: white; padding: 15px; border-radius: 5px; border: 1px solid #e0e0e0; margin-bottom: 15px;">
+                            <strong>Medarbejderens svar:</strong><br>${answer}
+                        </div>`;
+                        
+                        answersHtml += `<label style="color: #667eea; font-weight: 600; margin-top: 10px;">Dine kommentarer / Aftaler:</label>`;
+                        answersHtml += `<textarea 
+                            id="leader_comment_${q.id}" 
+                            onblur="saveLeaderComment('${q.id}')"
+                            style="width: 100%; min-height: 100px; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px;"
+                            placeholder="Skriv dine kommentarer eller aftaler her..."
+                        >${q.leaderComment || ''}</textarea>`;
+                        
+                    } else if (q.type === 'scale') {
+                        const answer = q.answer || '<em style="color: #999;">Ikke besvaret</em>';
+                        answersHtml += `<div style="background: white; padding: 10px; border-radius: 5px; border: 1px solid #e0e0e0; margin-bottom: 10px;">
+                            <strong>Vurdering:</strong> ${answer}
+                        </div>`;
+                        
+                        if (q.followup) {
+                            answersHtml += `<div style="background: white; padding: 15px; border-radius: 5px; border: 1px solid #e0e0e0; margin-bottom: 15px;">
+                                <strong>Medarbejderens uddybning:</strong><br>${q.followup}
+                            </div>`;
+                        }
+                        
+                        answersHtml += `<label style="color: #667eea; font-weight: 600; margin-top: 10px;">Dine kommentarer / Aftaler:</label>`;
+                        answersHtml += `<textarea 
+                            id="leader_comment_${q.id}" 
+                            onblur="saveLeaderComment('${q.id}')"
+                            style="width: 100%; min-height: 100px; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 14px;"
+                            placeholder="Skriv dine kommentarer eller aftaler her..."
+                        >${q.leaderComment || ''}</textarea>`;
+                    }
+
+                    answersHtml += `</div>`;
+                });
+
+                answersHtml += `</div>`;
+            });
+
+            document.getElementById('detailAnswers').innerHTML = answersHtml;
+            showScreen('employeeDetailScreen');
+        }
+
+        function backToLeaderDashboard() {
+            currentEmployeeDetail = null;
+            showLeaderDashboard();
+        }
+
+        function saveLeaderComment(questionId) {
+            const email = currentEmployeeDetail;
+            const userData = getAllMUSData()[email];
+            
+            for (let section of userData.answers) {
+                for (let q of section.questions) {
+                    if (q.id === questionId) {
+                        const commentField = document.getElementById(`leader_comment_${questionId}`);
+                        if (commentField) {
+                            q.leaderComment = commentField.value;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            saveMUSData(email, userData);
+        }
+
+        // Questions Editor
+        function renderQuestionsEditor() {
+            const questions = getQuestions();
+            
+            let html = '';
+
+            questions.forEach((section) => {
+                html += `<div class="question-section">`;
+                html += `<h3>${section.section}</h3>`;
+
+                section.questions.forEach((q, qIndex) => {
+                    html += `<div style="background: #fafafa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin-bottom: 15px;">`;
+                    html += `<label><strong>Spørgsmål ${qIndex + 1}:</strong></label>`;
+                    html += `<textarea id="edit_${q.id}" style="min-height: 60px;">${q.text}</textarea>`;
+                    html += `<p style="color: #666; font-size: 0.9em; margin-top: 5px;">Type: ${q.type === 'textarea' ? 'Åben tekst' : 'Skala + uddybning'}</p>`;
+                    html += `</div>`;
+                });
+
+                html += `</div>`;
+            });
+
+            document.getElementById('questionsEditor').innerHTML = html;
+        }
+
+        function saveQuestions() {
+            const questions = getQuestions();
+
+            questions.forEach((section) => {
+                section.questions.forEach((q) => {
+                    const textarea = document.getElementById(`edit_${q.id}`);
+                    if (textarea) {
+                        q.text = textarea.value;
+                    }
+                });
+            });
+
+            saveQuestionsToStorage(questions);
+            alert('✅ Spørgsmål gemt! Nye medarbejdere vil få de opdaterede spørgsmål.');
+        }
+
+        // Password Management
+        function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('Udfyld venligst alle felter');
+                return;
+            }
+
+            const passwords = getLeaderPasswords();
+
+            if (passwords[currentLeader] !== currentPassword) {
+                alert('Nuværende adgangskode er forkert');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                alert('De nye adgangskoder matcher ikke');
+                return;
+            }
+
+            if (newPassword.length < 4) {
+                alert('Adgangskoden skal være mindst 4 tegn');
+                return;
+            }
+
+            passwords[currentLeader] = newPassword;
+            saveLeaderPasswords(passwords);
+
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+
+            alert('✅ Adgangskode ændret!');
+        }
+
+        // Export to PDF
+        function exportToPDF() {
+            if (typeof window.jspdf === 'undefined') {
+                alert('⚠️ PDF-biblioteket er ikke loaded endnu.\n\nVent et øjeblik og prøv igen.');
+                return;
+            }
+
+            const email = currentEmployeeDetail;
+            const data = getAllMUSData()[email];
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                let yPos = 20;
+                const pageHeight = doc.internal.pageSize.height;
+                const margin = 20;
+                const maxWidth = 170;
+                
+                function addText(text, fontSize = 12, isBold = false, addSpace = 5) {
+                    if (yPos > pageHeight - 20) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                    
+                    doc.setFontSize(fontSize);
+                    doc.setFont(undefined, isBold ? 'bold' : 'normal');
+                    
+                    const lines = doc.splitTextToSize(text, maxWidth);
+                    lines.forEach(line => {
+                        if (yPos > pageHeight - 20) {
+                            doc.addPage();
+                            yPos = 20;
+                        }
+                        doc.text(line, margin, yPos);
+                        yPos += fontSize * 0.5;
+                    });
+                    yPos += addSpace;
+                }
+                
+                addText('Medarbejderudviklingssamtale (MUS)', 18, true, 10);
+                addText(`Medarbejder: ${data.name}`, 12, false, 3);
+                addText(`Klynge: ${data.cluster}`, 12, false, 3);
+                addText(`Dato: ${new Date().toLocaleDateString('da-DK')}`, 12, false, 10);
+                
+                if (data.booking) {
+                    addText(`MUS-samtale booket med ${data.booking.leader}: ${new Date(data.booking.datetime).toLocaleString('da-DK')}`, 11, false, 10);
+                }
+                
+                data.answers.forEach((section) => {
+                    addText(section.section, 14, true, 8);
+                    
+                    section.questions.forEach((q, qIdx) => {
+                        addText(`${qIdx + 1}. ${q.text}`, 11, true, 5);
+                        
+                        if (q.type === 'textarea') {
+                            addText('Medarbejderens svar:', 10, true, 3);
+                            addText(q.answer || 'Ikke besvaret', 10, false, 5);
+                            
+                            if (q.leaderComment) {
+                                addText('Lederens kommentarer / Aftaler:', 10, true, 3);
+                                addText(q.leaderComment, 10, false, 8);
+                            } else {
+                                yPos += 3;
+                            }
+                            
+                        } else if (q.type === 'scale') {
+                            addText(`Vurdering: ${q.answer || 'Ikke besvaret'}`, 10, false, 3);
+                            
+                            if (q.followup) {
+                                addText('Medarbejderens uddybning:', 10, true, 3);
+                                addText(q.followup, 10, false, 5);
+                            }
+                            
+                            if (q.leaderComment) {
+                                addText('Lederens kommentarer / Aftaler:', 10, true, 3);
+                                addText(q.leaderComment, 10, false, 8);
+                            } else {
+                                yPos += 3;
+                            }
+                        }
+                    });
+                });
+                
+                yPos += 15;
+                addText('Underskrifter', 14, true, 10);
+                addText('Medarbejder:', 11, true, 5);
+                addText('_________________________________________', 11, false, 3);
+                addText(`${data.name}`, 10, false, 3);
+                addText(`Dato: _____________________`, 10, false, 10);
+                addText('Leder:', 11, true, 5);
+                addText('_________________________________________', 11, false, 3);
+                addText(data.booking && data.booking.leader ? data.booking.leader : '___________________', 10, false, 3);
+                addText(`Dato: _____________________`, 10, false, 10);
+                
+                doc.save(`MUS_${data.name}_${new Date().toISOString().split('T')[0]}.pdf`);
+                
+                setTimeout(() => {
+                    if (confirm(`PDF-dokument gemt!\n\nVil du slette ${data.name}'s data fra systemet?\n\n(Data skal slettes når MUS er afholdt og dokumentet er lagt i P-sagen)`)) {
+                        const allData = getAllMUSData();
+                        delete allData[email];
+                        localStorage.setItem('musDataKatrinehaven', JSON.stringify(allData));
+                        
+                        alert('✅ Data slettet fra systemet');
+                        backToLeaderDashboard();
+                    }
+                }, 500);
+                
+            } catch (error) {
+                console.error('PDF export error:', error);
+                alert('❌ Der opstod en fejl ved eksport til PDF.\n\nFejl: ' + error.message + '\n\nPrøv at genindlæse siden (F5) og forsøg igen.');
+            }
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            initStorage();
+            
+            setTimeout(() => {
+                if (typeof window.jspdf === 'undefined') {
+                    console.error('jsPDF library failed to load from CDN');
+                }
+            }, 2000);
+        };
+    </script>
+</body>
+</html>
